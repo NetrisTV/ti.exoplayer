@@ -1,10 +1,11 @@
 /**
- * Appcelerator Titanium Mobile
+ * Titanium Exoplayer module
  * Copyright (c) 2009-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2017 by Netris, CJSC. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
-package ti.modules.titanium.media;
+package ru.netris.mobile.exoplayer;
 
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
@@ -21,24 +22,29 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.widget.TiVideoView8;
 
-public class TiVideoActivity extends Activity
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+
+public class TiExoplayerActivity extends Activity
 {
-	private static final String TAG = "TiVideoActivity";
+
+	private static final String TAG = "TiExoplayerActivity";
 
 	protected TiCompositeLayout layout = null;
 	private Messenger proxyMessenger = null;
 	private TiLifecycle.OnLifecycleEvent lifecycleListener = null;
 
-	public TiVideoActivity() {}
+	public TiExoplayerActivity()
+	{
+		super();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		Log.i(TAG, "TiVideoActivity onCreate", Log.DEBUG_MODE);
+		Log.i(TAG, "onCreate");
 
 		final Intent intent = getIntent();
 
@@ -50,7 +56,7 @@ public class TiVideoActivity extends Activity
 		}
 
 		layout = new TiCompositeLayout(this);
-		layout.addView(new TiVideoView8(this), new TiCompositeLayout.LayoutParams());
+		layout.addView(new SimpleExoPlayerView(this), new TiCompositeLayout.LayoutParams());
 
 		setContentView(layout);
 
@@ -65,17 +71,28 @@ public class TiVideoActivity extends Activity
 			}
 		}
 
-		Log.i(TAG, "exiting onCreate", Log.DEBUG_MODE);
+		Log.d(TAG, "exiting onCreate");
 	}
 
 	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
+	public void onConfigurationChanged(Configuration newConfig)
+	{
 		super.onConfigurationChanged(newConfig);
 		sendProxyMessage(VideoPlayerProxy.CONTROL_MSG_CONFIG_CHANGED);
 	}
 
 	@Override
-	protected void onStart() {
+	public void onNewIntent(Intent intent)
+	{
+		Log.d(TAG, "onNewIntent");
+//		releasePlayer();
+//		clearResumePosition();
+		setIntent(intent);
+	}
+
+	@Override
+	protected void onStart()
+	{
 		super.onStart();
 
 		if (lifecycleListener != null) {
@@ -84,7 +101,8 @@ public class TiVideoActivity extends Activity
 	}
 
 	@Override
-	protected void onResume() {
+	protected void onResume()
+	{
 		super.onResume();
 
 		TiApplication.getInstance().setCurrentActivity(this, this);
@@ -94,7 +112,8 @@ public class TiVideoActivity extends Activity
 	}
 
 	@Override
-	protected void onPause() {
+	protected void onPause()
+	{
 		super.onPause();
 
 		TiApplication.getInstance().setCurrentActivity(this, null);
@@ -104,7 +123,18 @@ public class TiVideoActivity extends Activity
 	}
 
 	@Override
-	protected void onDestroy() {
+	protected void onStop()
+	{
+		super.onStop();
+
+		if (lifecycleListener != null) {
+			lifecycleListener.onPause(this);
+		}
+	}
+
+	@Override
+	protected void onDestroy()
+	{
 		super.onDestroy();
 
 		if (lifecycleListener != null) {
