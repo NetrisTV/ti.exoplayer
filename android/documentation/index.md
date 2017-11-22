@@ -36,7 +36,8 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `thumbnailImageAtTime`: not supported
 
 ### Events
-* `durationAvailable`: removed
+* `durationAvailable`: removed (was deprecated, use `durationavailable`)
+* `playbackState`: removed (was deprecated, use `playbackstate`)
 * `error`: removed property `code`, added property `type` (`ExoPlayer.EXCEPTION_TYPE_*`)
 
 ### Properties
@@ -76,4 +77,4 @@ Sergey Volkov <s.volkov@netris.ru>
 
 ## License
 
-Apache 2.0, see [LICENSE](LICENSE)
+Apache 2.0, see [LICENSE](../LICENSE)

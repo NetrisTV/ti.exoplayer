@@ -1,3 +1,5 @@
+A native control for playing videos for Titanium. Based on Google ExoPlayer, using Titanium.Media.VideoPlayer API.
+
 Requirements
 ---------------
 - Titanium Mobile SDK 6.3.0.GA or later
