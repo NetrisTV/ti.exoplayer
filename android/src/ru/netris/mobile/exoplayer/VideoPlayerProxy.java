@@ -624,7 +624,6 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 
 	public void onPlaybackError(int type, String message)
 	{
-		Log.d(TAG, "onPlaybackError " + type + " " + message);
 		firePlaybackState(MediaModule.VIDEO_PLAYBACK_STATE_INTERRUPTED);
 		KrollDict data = new KrollDict();
 		data.put(TiC.EVENT_PROPERTY_MESSAGE, message);
@@ -632,6 +631,20 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		fireEvent(TiC.EVENT_ERROR, data);
 		fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 		fireComplete(MediaModule.VIDEO_FINISH_REASON_PLAYBACK_ERROR);
+	}
+
+	public void onTracksChanged(KrollDict tracks)
+	{
+		KrollDict data = new KrollDict();
+		data.put("trackInfo", tracks);
+		fireEvent(TiExoplayerModule.EVENT_TRACKS_CHANGED, data);
+	}
+
+	public void onMetadata(KrollDict metadata)
+	{
+		KrollDict data = new KrollDict();
+		data.put("metadata", metadata);
+		fireEvent(TiExoplayerModule.EVENT_METADATA, data);
 	}
 
 	private String getActionName(int action)

@@ -15,6 +15,7 @@ import org.appcelerator.kroll.common.TiConfig;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.RendererCapabilities;
 
 
 @Kroll.module(name = "TiExoplayer", id = "ru.netris.mobile.exoplayer")
@@ -30,6 +31,9 @@ public class TiExoplayerModule extends KrollModule
 	public static final String PREFER_EXTENSION_DECODERS = "preferExtensionDecoders";
 	public static final String CONTENT_TYPE = "contentType";
 	public static final String AD_TAG_URI_EXTRA = "adTagUri";
+
+	public static final String EVENT_TRACKS_CHANGED = "tracksChanged";
+	public static final String EVENT_METADATA = "metadata";
 
 	@Kroll.constant
 	public static final int EXCEPTION_TYPE_SOURCE = ExoPlaybackException.TYPE_SOURCE;
@@ -60,6 +64,52 @@ public class TiExoplayerModule extends KrollModule
 
 	@Kroll.constant
 	public static final int CONTENT_TYPE_OTHER = C.TYPE_OTHER;
+
+	@Kroll.constant
+	public static final int TRACK_TYPE_UNKNOWN = C.TRACK_TYPE_UNKNOWN;
+
+	@Kroll.constant
+	public static final int TRACK_TYPE_DEFAULT = C.TRACK_TYPE_DEFAULT;
+
+	@Kroll.constant
+	public static final int TRACK_TYPE_AUDIO = C.TRACK_TYPE_AUDIO;
+
+	@Kroll.constant
+	public static final int TRACK_TYPE_VIDEO = C.TRACK_TYPE_VIDEO;
+
+	@Kroll.constant
+	public static final int TRACK_TYPE_TEXT = C.TRACK_TYPE_TEXT;
+
+	@Kroll.constant
+	public static final int TRACK_TYPE_METADATA = C.TRACK_TYPE_METADATA;
+
+	@Kroll.constant
+	public static final int TRACK_TYPE_CUSTOM_BASE = C.TRACK_TYPE_CUSTOM_BASE;
+
+	@Kroll.constant
+	public static final int FORMAT_HANDLED = RendererCapabilities.FORMAT_HANDLED;
+
+	@Kroll.constant
+	public static final int FORMAT_EXCEEDS_CAPABILITIES = RendererCapabilities.FORMAT_EXCEEDS_CAPABILITIES;
+
+	@Kroll.constant
+	public static final int FORMAT_UNSUPPORTED_DRM = RendererCapabilities.FORMAT_UNSUPPORTED_DRM;
+
+	@Kroll.constant
+	public static final int FORMAT_UNSUPPORTED_SUBTYPE = RendererCapabilities.FORMAT_UNSUPPORTED_SUBTYPE;
+
+	@Kroll.constant
+	public static final int FORMAT_UNSUPPORTED_TYPE = RendererCapabilities.FORMAT_UNSUPPORTED_TYPE;
+
+	@Kroll.constant
+	public static final int ADAPTIVE_SEAMLESS = RendererCapabilities.ADAPTIVE_SEAMLESS;
+
+	@Kroll.constant
+	public static final int ADAPTIVE_NOT_SEAMLESS = RendererCapabilities.ADAPTIVE_NOT_SEAMLESS;
+
+	@Kroll.constant
+	public static final int ADAPTIVE_NOT_SUPPORTED = RendererCapabilities.ADAPTIVE_NOT_SUPPORTED;
+
 
 	public TiExoplayerModule()
 	{

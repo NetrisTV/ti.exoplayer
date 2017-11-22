@@ -19,6 +19,8 @@ import org.appcelerator.titanium.util.TiConvert;
 import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiUIView;
 
+import org.json.JSONException;
+
 import ti.modules.titanium.media.TiPlaybackListener;
 import ti.modules.titanium.media.MediaModule;
 
@@ -60,6 +62,8 @@ import com.google.android.exoplayer2.drm.UnsupportedDrmException;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.DecoderInitializationException;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil.DecoderQueryException;
+import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.metadata.MetadataRenderer;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -89,7 +93,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 public class TiUIVideoView extends TiUIView implements EventListener,
-		PlaybackControlView.VisibilityListener
+		PlaybackControlView.VisibilityListener, MetadataRenderer.Output
 
 {
 	private static final String TAG = "TiUIVideoView";
@@ -534,20 +538,24 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections)
 	{
 		Log.d(TAG, "onTracksChanged");
-//		updateButtonVisibilities();    //debug buttons
 		if (trackGroups != lastSeenTrackGroupArray) {
 			MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-			if (mappedTrackInfo != null) {
-				if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_VIDEO)
-						== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
-					showToast(R.string.error_unsupported_video);
-				}
-				if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_AUDIO)
-						== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
-					showToast(R.string.error_unsupported_audio);
-				}
+			try {
+				getPlayerProxy().onTracksChanged(new KrollDict(
+						ModuleUtil.buildTrackInfoJSONObject(mappedTrackInfo, trackSelections, player)));
+			} catch (JSONException e) {
+				Log.e(TAG, e.getMessage());
 			}
 			lastSeenTrackGroupArray = trackGroups;
+		}
+	}
+
+	@Override
+	public void onMetadata(Metadata metadata) {
+		try {
+			getPlayerProxy().onMetadata(new KrollDict(ModuleUtil.buildMetadataJSONObject(metadata)));
+		} catch (JSONException e) {
+			Log.e(TAG, e.getMessage());
 		}
 	}
 
@@ -635,6 +643,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector);
 			player.addListener(this);
 			player.addListener(eventLogger);
+			player.addMetadataOutput(this);
 			player.addMetadataOutput(eventLogger);
 			player.setAudioDebugListener(eventLogger);
 			player.setVideoDebugListener(eventLogger);
