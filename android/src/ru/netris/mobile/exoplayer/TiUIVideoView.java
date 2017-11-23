@@ -77,9 +77,11 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector.MappedTrackInfo;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector.SelectionOverride;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
@@ -115,6 +117,9 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	private DefaultTrackSelector trackSelector;
 
 	private Handler mainHandler;
+
+	private TrackSelection.Factory adaptiveTrackSelectionFactory;
+	private TrackSelection.Factory fixedTrackSelectionFactory;
 
 	private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
 
@@ -410,6 +415,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		super.release();
 		releasePlayer();
 		releaseAdsLoader();
+		adaptiveTrackSelectionFactory = null;
+		fixedTrackSelectionFactory = null;
 		videoView = null;
 		mediaController = null;
 		trackSelector = null;
@@ -601,8 +608,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		readyFired = false;
 		boolean needNewPlayer = player == null;
 		if (needNewPlayer) {
-			TrackSelection.Factory adaptiveTrackSelectionFactory =
-					new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+			adaptiveTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+			fixedTrackSelectionFactory = new FixedTrackSelection.Factory();
 			trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
 			lastSeenTrackGroupArray = null;
 			eventLogger = new EventLogger(trackSelector);
@@ -709,6 +716,36 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		player.prepare(mediaSource, !haveResumePosition, false);
 		inErrorState = false;
 //		updateButtonVisibilities();  //debug buttons
+	}
+
+	public void setTrackSelectionOverride(int rendererIndex, int groupIndex, int[] tracks)
+	{
+		MappedTrackInfo trackInfo = trackSelector.getCurrentMappedTrackInfo();
+		TrackGroupArray trackGroups = trackInfo.getTrackGroups(rendererIndex);
+		SelectionOverride override = trackSelector.getSelectionOverride(rendererIndex, trackGroups);
+		TrackSelection.Factory factory = tracks.length == 1
+				? fixedTrackSelectionFactory
+				: adaptiveTrackSelectionFactory;
+		override = new SelectionOverride(factory, groupIndex, tracks);
+		trackSelector.setRendererDisabled(rendererIndex, false);
+		trackSelector.setSelectionOverride(rendererIndex, trackGroups, override);
+	}
+
+	public void clearTrackSelectionOverrides(int rendererIndex)
+	{
+		MappedTrackInfo trackInfo = trackSelector.getCurrentMappedTrackInfo();
+		TrackGroupArray trackGroups = trackInfo.getTrackGroups(rendererIndex);
+		SelectionOverride override = trackSelector.getSelectionOverride(rendererIndex, trackGroups);
+		override = trackSelector.getSelectionOverride(rendererIndex, trackGroups);
+		trackSelector.setRendererDisabled(rendererIndex, false);
+		if (override != null) {
+			trackSelector.clearSelectionOverrides(rendererIndex);
+		}
+	}
+
+	public void setRendererDisabled(int rendererIndex, boolean disabled)
+	{
+		trackSelector.setRendererDisabled(rendererIndex, disabled);
 	}
 
 	private void showToast(int messageId)

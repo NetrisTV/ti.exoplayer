@@ -748,6 +748,30 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	}
 
 	@Kroll.method
+	public void setTrackSelectionOverride(int rendererIndex, int groupIndex, int[] tracks)
+	{
+		if (view != null) {
+			getVideoView().setTrackSelectionOverride(rendererIndex, groupIndex, tracks);
+		}
+	}
+
+	@Kroll.method
+	public void clearTrackSelectionOverrides(int rendererIndex)
+	{
+		if (view != null) {
+			getVideoView().clearTrackSelectionOverrides(rendererIndex);
+		}
+	}
+
+	@Kroll.method
+	public void setRendererDisabled(int rendererIndex, boolean disabled)
+	{
+		if (view != null) {
+			getVideoView().setRendererDisabled(rendererIndex, disabled);
+		}
+	}
+
+	@Kroll.method
 	public void requestThumbnailImagesAtTimes(Object[] times, Object option, KrollFunction callback)
 	{
 		if (hasProperty(TiC.PROPERTY_URL)) {
