@@ -20,6 +20,7 @@ import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiUIView;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import ti.modules.titanium.media.TiPlaybackListener;
 import ti.modules.titanium.media.MediaModule;
@@ -276,7 +277,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		} else if (mode == MediaModule.VIDEO_SCALING_MODE_FILL) {
 			videoView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
 			player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-		} else if (mode == MediaModule. VIDEO_SCALING_NONE) {
+		} else if (mode == MediaModule.VIDEO_SCALING_NONE) {
 			Log.w(TAG, "unsupported scaling mode VIDEO_SCALING_NONE");
 			videoView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 			player.setVideoScalingMode(C.VIDEO_SCALING_MODE_DEFAULT);
@@ -538,20 +539,32 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections)
 	{
 		Log.d(TAG, "onTracksChanged");
-		if (trackGroups != lastSeenTrackGroupArray) {
-			MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-			try {
-				getPlayerProxy().onTracksChanged(new KrollDict(
-						ModuleUtil.buildTrackInfoJSONObject(mappedTrackInfo, trackSelections, player)));
-			} catch (JSONException e) {
-				Log.e(TAG, e.getMessage());
+		MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+		try {
+			JSONObject trackInfo =
+					ModuleUtil.buildTrackInfoJSONObject(mappedTrackInfo, trackSelections, player);
+			if (trackGroups != lastSeenTrackGroupArray) {
+				if (mappedTrackInfo != null) {
+					if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_VIDEO)
+							== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
+						trackInfo.put("unsupportedVideo", true);
+					}
+					if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_AUDIO)
+							== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
+						trackInfo.put("unsupportedAudio", true);
+					}
+				}
+				lastSeenTrackGroupArray = trackGroups;
 			}
-			lastSeenTrackGroupArray = trackGroups;
+			getPlayerProxy().onTracksChanged(new KrollDict(trackInfo));
+		} catch (JSONException e) {
+			Log.e(TAG, e.getMessage());
 		}
 	}
 
 	@Override
-	public void onMetadata(Metadata metadata) {
+	public void onMetadata(Metadata metadata)
+	{
 		try {
 			getPlayerProxy().onMetadata(new KrollDict(ModuleUtil.buildMetadataJSONObject(metadata)));
 		} catch (JSONException e) {
