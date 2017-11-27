@@ -50,7 +50,7 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `requestThumbnailImagesAtTimes`: not supported
 * `thumbnailImageAtTime`: not supported
 * `setTrackSelectionOverride`: new method [`MappingTrackSelector.setSelectionOverride`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/trackselection/MappingTrackSelector.html#setSelectionOverride-int-com.google.android.exoplayer2.source.TrackGroupArray-com.google.android.exoplayer2.trackselection.MappingTrackSelector.SelectionOverride-)
-* `clearSelectionOverrides`: new method [`MappingTrackSelector.clearSelectionOverrides`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/trackselection/MappingTrackSelector.html#clearSelectionOverrides-int-)
+* `clearTrackSelectionOverrides`: new method [`MappingTrackSelector.clearSelectionOverrides`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/trackselection/MappingTrackSelector.html#clearSelectionOverrides-int-)
 * `setRendererDisabled`: new method [`MappingTrackSelector.setRendererDisabled`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/trackselection/MappingTrackSelector.html#setRendererDisabled-int-boolean-)
 
 ### Events
