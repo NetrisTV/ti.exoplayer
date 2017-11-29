@@ -518,9 +518,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	}
 
 	@Override
-	public void onPositionDiscontinuity()
-	{
-		Log.d(TAG, "onPositionDiscontinuity");
+	public void onPositionDiscontinuity(@Player.DiscontinuityReason int reason) {
+		Log.d(TAG, "positionDiscontinuity [" + getDiscontinuityReasonString(reason) + "]");
 		if (inErrorState) {
 			// This will only occur if the user has performed a seek whilst in the error state. Update the
 			// resume position so that if the user then retries, playback will resume from the position to
@@ -533,6 +532,11 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	public void onRepeatModeChanged(int repeatMode)
 	{
 		Log.d(TAG, "onRepeatModeChanged");
+	}
+
+	@Override
+	public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+		Log.d(TAG, "shuffleModeEnabled [" + shuffleModeEnabled + "]");
 	}
 
 	@Override
@@ -567,6 +571,11 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		} catch (JSONException e) {
 			Log.e(TAG, e.getMessage());
 		}
+	}
+
+	@Override
+	public void onSeekProcessed() {
+		Log.d(TAG, "seekProcessed");
 	}
 
 	@Override
@@ -895,5 +904,20 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		return new DefaultDataSourceFactory(TiApplication.getInstance(),
 				useBandwidthMeter ? BANDWIDTH_METER : null,
 				buildHttpDataSourceFactory(useBandwidthMeter));
+	}
+
+	private static String getDiscontinuityReasonString(@Player.DiscontinuityReason int reason) {
+		switch (reason) {
+			case Player.DISCONTINUITY_REASON_PERIOD_TRANSITION:
+				return "PERIOD_TRANSITION";
+			case Player.DISCONTINUITY_REASON_SEEK:
+				return "SEEK";
+			case Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT:
+				return "SEEK_ADJUSTMENT";
+			case Player.DISCONTINUITY_REASON_INTERNAL:
+				return "INTERNAL";
+			default:
+				return "?";
+		}
 	}
 }

@@ -30,7 +30,7 @@ import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.metadata.Metadata;
-import com.google.android.exoplayer2.metadata.MetadataRenderer;
+import com.google.android.exoplayer2.metadata.MetadataOutput;
 import com.google.android.exoplayer2.metadata.emsg.EventMessage;
 import com.google.android.exoplayer2.metadata.id3.ApicFrame;
 import com.google.android.exoplayer2.metadata.id3.CommentFrame;
@@ -60,7 +60,7 @@ import java.util.Locale;
 /* package */ final class EventLogger implements Player.EventListener, AudioRendererEventListener,
 		VideoRendererEventListener, AdaptiveMediaSourceEventListener,
 		ExtractorMediaSource.EventListener, DefaultDrmSessionManager.EventListener,
-		MetadataRenderer.Output {
+		MetadataOutput {
 
 	private static final String TAG = "EventLogger";
 	private static final int MAX_TIMELINE_ITEM_LINES = 3;
@@ -104,8 +104,13 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void onPositionDiscontinuity() {
-		Log.d(TAG, "positionDiscontinuity");
+	public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+		Log.d(TAG, "shuffleModeEnabled [" + shuffleModeEnabled + "]");
+	}
+
+	@Override
+	public void onPositionDiscontinuity(@Player.DiscontinuityReason int reason) {
+		Log.d(TAG, "positionDiscontinuity [" + getDiscontinuityReasonString(reason) + "]");
 	}
 
 	@Override
@@ -208,6 +213,11 @@ import java.util.Locale;
 		Log.d(TAG, "]");
 	}
 
+	@Override
+	public void onSeekProcessed() {
+		Log.d(TAG, "seekProcessed");
+	}
+
 	// MetadataRenderer.Output
 
 	@Override
@@ -247,7 +257,7 @@ import java.util.Locale;
 	}
 
 	@Override
-	public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+	public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
 		printInternalError("audioTrackUnderrun [" + bufferSize + ", " + bufferSizeMs + ", "
 				+ elapsedSinceLastFeedMs + "]", null);
 	}
@@ -479,6 +489,21 @@ import java.util.Locale;
 				return "ONE";
 			case Player.REPEAT_MODE_ALL:
 				return "ALL";
+			default:
+				return "?";
+		}
+	}
+
+	private static String getDiscontinuityReasonString(@Player.DiscontinuityReason int reason) {
+		switch (reason) {
+			case Player.DISCONTINUITY_REASON_PERIOD_TRANSITION:
+				return "PERIOD_TRANSITION";
+			case Player.DISCONTINUITY_REASON_SEEK:
+				return "SEEK";
+			case Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT:
+				return "SEEK_ADJUSTMENT";
+			case Player.DISCONTINUITY_REASON_INTERNAL:
+				return "INTERNAL";
 			default:
 				return "?";
 		}
