@@ -218,7 +218,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		}
 
 		if (key.equals(TiC.PROPERTY_URL) || key.equals(TiC.PROPERTY_CONTENT_URL)) {
-			if (newValue != null) {
+			if (newValue != null && !"".equals(newValue)) {
 				getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 				initializePlayer();
 			} else {
@@ -614,9 +614,9 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	public void initializePlayer()
 	{
 		VideoPlayerProxy proxy = getPlayerProxy();
-		readyFired = false;
 		boolean needNewPlayer = player == null;
 		if (needNewPlayer) {
+			readyFired = false;
 			adaptiveTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
 			fixedTrackSelectionFactory = new FixedTrackSelection.Factory();
 			trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
@@ -678,9 +678,9 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			player.setVideoDebugListener(eventLogger);
 
 			videoView.setPlayer(player);
-			player.setPlayWhenReady(shouldAutoPlay);
 			setScalingMode(getPlayerProxy().getScalingMode());
 		}
+		player.setPlayWhenReady(shouldAutoPlay);
 		if (!proxy.hasProperty(TiC.PROPERTY_URL)) {
 			return;
 		}
@@ -710,6 +710,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			Object initialPlaybackTime = proxy.getProperty(TiC.PROPERTY_INITIAL_PLAYBACK_TIME);
 			if (initialPlaybackTime != null) {
 				seekTo = TiConvert.toInt(initialPlaybackTime);
+				proxy.setProperty(TiC.PROPERTY_INITIAL_PLAYBACK_TIME, 0);
 			}
 			// Resuming from an activity pause?
 			Object seekToOnResume = proxy.getProperty(VideoPlayerProxy.PROPERTY_SEEK_TO_ON_RESUME);
@@ -717,9 +718,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 				seekTo = TiConvert.toInt(seekToOnResume);
 				proxy.setProperty(VideoPlayerProxy.PROPERTY_SEEK_TO_ON_RESUME, 0);
 			}
-			if (seekTo > 0) {
-				player.seekTo(seekTo);
-			}
+			player.seekTo(seekTo);
 		}
 
 		player.prepare(mediaSource, !haveResumePosition, false);
