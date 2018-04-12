@@ -34,6 +34,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Messenger;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -69,7 +70,10 @@ import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.ads.AdsLoader;
+import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -90,10 +94,8 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 public class TiUIVideoView extends TiUIView implements EventListener,
 		PlaybackControlView.VisibilityListener, MetadataRenderer.Output
@@ -125,9 +127,9 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 
 	// Fields used only for ad playback. The ads loader is loaded via reflection.
 
-	private Object imaAdsLoader; // com.google.android.exoplayer2.ext.ima.ImaAdsLoader
+	private AdsLoader adsLoader;
 	private Uri loadedAdTagUri;
-	private ViewGroup adOverlayViewGroup;
+	private ViewGroup adUiViewGroup;
 	private Messenger proxyMessenger = null;
 
 	public TiUIVideoView(TiViewProxy proxy)
@@ -553,9 +555,10 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	}
 
 	@Override
-	public void onTimelineChanged(Timeline timeline, Object manifest)
+	public void onTimelineChanged(Timeline timeline, Object manifest,
+	                              @Player.TimelineChangeReason int reason)
 	{
-		Log.d(TAG, "onTimelineChanged");
+		Log.d(TAG, "onTimelineChanged (" + reason + ")");
 	}
 
 	@Override
@@ -699,7 +702,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		}
 		Uri uri = Uri.parse(TiConvert.toString(proxy.getProperty(TiC.PROPERTY_URL)));
 		Object contentType = proxy.getProperty(TiExoplayerModule.CONTENT_TYPE);
-		MediaSource mediaSource = buildMediaSource(uri, contentType);
+		MediaSource mediaSource = buildMediaSource(uri, contentType, mainHandler, eventLogger);
 		String adTagUriString = TiConvert.toString(proxy.getProperty(TiExoplayerModule.AD_TAG_URI_EXTRA));
 		if (adTagUriString != null) {
 			Uri adTagUri = Uri.parse(adTagUriString);
@@ -807,7 +810,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	}
 
 	private DrmSessionManager<FrameworkMediaCrypto> buildDrmSessionManagerV18(UUID uuid,
-	                                                                          String licenseUrl, String[] keyRequestPropertiesArray) throws UnsupportedDrmException
+      String licenseUrl, String[] keyRequestPropertiesArray) throws UnsupportedDrmException
 	{
 		HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl,
 				buildHttpDataSourceFactory(false));
@@ -821,22 +824,26 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 				null, mainHandler, eventLogger);
 	}
 
-	private MediaSource buildMediaSource(Uri uri, Object overrideContentType)
+	private MediaSource buildMediaSource(
+			Uri uri,
+			Object overrideContentType,
+			@Nullable Handler handler,
+			@Nullable MediaSourceEventListener listener)
 	{
 		int type = overrideContentType == null ? Util.inferContentType(uri)
 				: TiConvert.toInt(overrideContentType);
 		switch (type) {
 			case C.TYPE_SS:
 				return new SsMediaSource(uri, buildDataSourceFactory(false),
-						new DefaultSsChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger);
+						new DefaultSsChunkSource.Factory(mediaDataSourceFactory), handler, listener);
 			case C.TYPE_DASH:
 				return new DashMediaSource(uri, buildDataSourceFactory(false),
-						new DefaultDashChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger);
+						new DefaultDashChunkSource.Factory(mediaDataSourceFactory), handler, listener);
 			case C.TYPE_HLS:
-				return new HlsMediaSource(uri, mediaDataSourceFactory, mainHandler, eventLogger);
+				return new HlsMediaSource(uri, mediaDataSourceFactory, handler, listener);
 			case C.TYPE_OTHER:
-				return new ExtractorMediaSource(uri, mediaDataSourceFactory, new DefaultExtractorsFactory(),
-						mainHandler, eventLogger);
+				return new ExtractorMediaSource.Factory(mediaDataSourceFactory)
+						.createMediaSource(uri, handler, listener);
 			default: {
 				throw new IllegalStateException("Unsupported type: " + type);
 			}
@@ -845,16 +852,9 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 
 	private void releaseAdsLoader()
 	{
-		if (imaAdsLoader != null) {
-			try {
-				Class<?> loaderClass = Class.forName("com.google.android.exoplayer2.ext.ima.ImaAdsLoader");
-				Method releaseMethod = loaderClass.getMethod("release");
-				releaseMethod.invoke(imaAdsLoader);
-			} catch (Exception e) {
-				// Should never happen.
-				throw new IllegalStateException(e);
-			}
-			imaAdsLoader = null;
+		if (adsLoader != null) {
+			adsLoader.release();
+			adsLoader = null;
 			loadedAdTagUri = null;
 			videoView.getOverlayFrameLayout().removeAllViews();
 		}
@@ -871,19 +871,29 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		// Load the extension source using reflection so the demo app doesn't have to depend on it.
 		// The ads loader is reused for multiple playbacks, so that ad playback can resume.
 		Class<?> loaderClass = Class.forName("com.google.android.exoplayer2.ext.ima.ImaAdsLoader");
-		if (imaAdsLoader == null) {
-			imaAdsLoader = loaderClass.getConstructor(Context.class, Uri.class)
+		if (adsLoader == null) {
+			adsLoader = (AdsLoader) loaderClass.getConstructor(Context.class, Uri.class)
 					.newInstance(activity, adTagUri);
-			adOverlayViewGroup = new FrameLayout(activity);
+			adUiViewGroup = new FrameLayout(activity);
 			// The demo app has a non-null overlay frame layout.
-			videoView.getOverlayFrameLayout().addView(adOverlayViewGroup);
+			videoView.getOverlayFrameLayout().addView(adUiViewGroup);
 		}
-		Class<?> sourceClass =
-				Class.forName("com.google.android.exoplayer2.ext.ima.ImaAdsMediaSource");
-		Constructor<?> constructor = sourceClass.getConstructor(MediaSource.class,
-				DataSource.Factory.class, loaderClass, ViewGroup.class);
-		return (MediaSource) constructor.newInstance(mediaSource, mediaDataSourceFactory, imaAdsLoader,
-				adOverlayViewGroup);
+		AdsMediaSource.MediaSourceFactory adMediaSourceFactory =
+				new AdsMediaSource.MediaSourceFactory() {
+					@Override
+					public MediaSource createMediaSource(
+							Uri uri, @Nullable Handler handler, @Nullable MediaSourceEventListener listener) {
+						return TiUIVideoView.this.buildMediaSource(
+								uri, /* overrideExtension= */ null, handler, listener);
+					}
+
+					@Override
+					public int[] getSupportedTypes() {
+						return new int[] {C.TYPE_DASH, C.TYPE_SS, C.TYPE_HLS, C.TYPE_OTHER};
+					}
+				};
+		return new AdsMediaSource(
+				mediaSource, adMediaSourceFactory, adsLoader, adUiViewGroup, mainHandler, eventLogger);
 	}
 
 	/**
