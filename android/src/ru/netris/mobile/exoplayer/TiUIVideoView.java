@@ -230,6 +230,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			player.setVolume(TiConvert.toFloat(newValue));
 		} else if (key.equals(TiC.PROPERTY_REPEAT_MODE)) {
 			setRepeatMode(TiConvert.toInt(newValue));
+		} else if (key.equals(TiC.PROPERTY_SHOWS_CONTROLS)) {
+			setMediaControlStyle(getPlayerProxy().getMediaControlStyle());
 		} else if (key.equals(TiC.PROPERTY_AUTOPLAY)) {
 			shouldAutoPlay = TiConvert.toBoolean(newValue);
 			if (player != null) {
@@ -308,8 +310,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			return;
 		}
 
+		// Determine if the overlaid controls should be shown/hidden based on given media style.
 		boolean showController = true;
-
 		switch (style) {
 			case MediaModule.VIDEO_CONTROL_DEFAULT:
 			case MediaModule.VIDEO_CONTROL_EMBEDDED:
@@ -322,6 +324,17 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 				break;
 		}
 
+		// If VideoPlayer's "showsControls" property is false,
+		// then ignore "mediaControlStyle" property and hide controls.
+		VideoPlayerProxy proxy = getPlayerProxy();
+		if (proxy != null) {
+			Object value = proxy.getProperty(TiC.PROPERTY_SHOWS_CONTROLS);
+			if ((value instanceof Boolean) && value.equals(Boolean.FALSE)) {
+				showController = false;
+			}
+		}
+
+		// Show/hide the video's overlaid controls.
 		videoView.setUseController(showController);
 	}
 

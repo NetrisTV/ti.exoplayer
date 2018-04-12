@@ -17,7 +17,7 @@ var OPTIONS = {
   fullscreen: false,
   autoplay: true,
   repeatMode: false,
-  mediaControlStyle: true
+  showsControls: true
 };
 
 /**
@@ -30,7 +30,7 @@ var OPTIONS = {
  *   default: boolean,
  *   fullscreen: boolean,
  *   autoplay: boolean,
- *   mediaControlStyle: number,
+ *   showsControls: boolean,
  *   repeatMode: number,
  *   ur: string
  * }} options
@@ -186,8 +186,7 @@ function createTable(json) {
         autoplay: OPTIONS.autoplay,
         repeatMode: OPTIONS.repeatMode ?
           Ti.Media.VIDEO_REPEAT_MODE_ONE : Ti.Media.VIDEO_REPEAT_MODE_NONE,
-        mediaControlStyle: OPTIONS.mediaControlStyle ?
-          Ti.Media.VIDEO_CONTROL_DEFAULT : Ti.Media.VIDEO_CONTROL_NONE
+        showsControls: OPTIONS.showsControls
       };
       Object.keys(options).forEach(function(key) {
         var temp = convertProperty(key, options[key]);

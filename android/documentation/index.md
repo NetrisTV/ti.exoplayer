@@ -66,6 +66,7 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `drmLicenseUrl`
 * `drmKeyRequestProperties`
 * `adTagUri`
+* `showsControls`: [`videoPlayer.showsControls`](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media.VideoPlayer-property-showsControls)
 
 ## Usage
 

@@ -97,6 +97,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	{
 		super();
 		defaultValues.put(TiC.PROPERTY_VOLUME, 1.0f);
+		defaultValues.put(TiC.PROPERTY_SHOWS_CONTROLS, true);
 		defaultValues.put(TiC.PROPERTY_AUTOPLAY, true);
 		defaultValues.put(TiC.PROPERTY_MEDIA_CONTROL_STYLE, MediaModule.VIDEO_CONTROL_DEFAULT);
 	}
