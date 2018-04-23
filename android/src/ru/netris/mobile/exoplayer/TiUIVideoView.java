@@ -693,8 +693,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			player.setAudioDebugListener(eventLogger);
 			player.setVideoDebugListener(eventLogger);
 
+			processProperties(getPlayerProxy().getProperties());
 			videoView.setPlayer(player);
-			setScalingMode(getPlayerProxy().getScalingMode());
 		}
 		player.setPlayWhenReady(shouldAutoPlay);
 		if (!proxy.hasProperty(TiC.PROPERTY_URL)) {
