@@ -60,6 +60,22 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `metadata`: new event, property `metadata`
 * `tracksChanged`: new event, property `trackInfo`
 
+* `bufferUpdate`: 
+* `positionUpdate`: 
+* `ready`: 
+* `stalled`: 
+* `didComplete`: 
+* `willPlay`: 
+* `playing`: 
+* `willPause`: 
+* `didPause`: 
+* `willStop`: 
+* `didStop`: 
+* `error`: 
+* `seek`: 
+* `willSeek`: 
+* `didSeek`: 
+
 ### Properties
 * `contentType`: one of `ExoPlayer.CONTENT_TYPE_*`
 * `drmScheme`: one of `ExoPlayer.DRM_*`

@@ -571,12 +571,15 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 			args.putCodeAndMessage(0, null);
 		}
 		fireEvent(TiC.EVENT_COMPLETE, args);
+		fireEvent("didComplete", null);
 	}
 
 	public void firePlaying()
 	{
 		KrollDict args = new KrollDict();
 		args.put(TiC.EVENT_PROPERTY_URL, getProperty(TiC.PROPERTY_URL));
+		fireEvent("willPlay", null);
+		fireEvent("playing", null);
 		fireEvent(TiC.EVENT_PLAYING, args);
 	}
 
@@ -593,9 +596,10 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		fireEvent(TiC.EVENT_DURATION_AVAILABLE, data);
 		fireEvent(TiC.EVENT_PRELOAD, null);
 		fireEvent(TiC.EVENT_LOAD, null); // No distinction between load and preload in our case.
+		fireEvent("ready", null);
 		fireLoadState(MediaModule.VIDEO_LOAD_STATE_PLAYABLE);
 	}
-
+	
 	public void onPlaybackStarted()
 	{
 		firePlaybackState(MediaModule.VIDEO_PLAYBACK_STATE_PLAYING);
@@ -608,11 +612,15 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 
 	public void onPlaybackPaused()
 	{
+		fireEvent("willPause", null);
+		fireEvent("didPause", null);
 		firePlaybackState(MediaModule.VIDEO_PLAYBACK_STATE_PAUSED);
 	}
 
 	public void onPlaybackStopped()
 	{
+		fireEvent("willStop", null);
+		fireEvent("didStop", null);
 		firePlaybackState(MediaModule.VIDEO_PLAYBACK_STATE_STOPPED);
 		fireComplete(MediaModule.VIDEO_FINISH_REASON_USER_EXITED);
 	}
@@ -629,7 +637,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		KrollDict data = new KrollDict();
 		data.put(TiC.EVENT_PROPERTY_MESSAGE, message);
 		data.put(TiC.EVENT_PROPERTY_TYPE, type);
-		fireEvent(TiC.EVENT_ERROR, data);
+		fireEvent(TiC.EVENT_ERROR, data); // TiC.EVENT_ERROR = error
 		fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 		fireComplete(MediaModule.VIDEO_FINISH_REASON_PLAYBACK_ERROR);
 	}

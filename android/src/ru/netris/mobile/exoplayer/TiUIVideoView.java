@@ -528,7 +528,18 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 				proxy.firePlaying();
 			}
 		} else if (playbackState == Player.STATE_BUFFERING) {
-			// Do nothing.
+			if (proxy.hasListeners("stalled")) {
+				proxy.fireEvent("stalled", null);
+			}
+			// https://github.com/clappr/clappr-ios/blob/dev/Sources/Clappr_iOS/Classes/Plugin/Playback/AVFoundationPlayback.swift#L421
+			if (proxy.hasListeners("bufferUpdate")) {
+				KrollDict data = new KrollDict();
+				data.put(TiC.PROPERTY_DURATION, player.getDuration());
+				data.put("start_position", 0);
+				data.put("end_position", player.getBufferedPosition());
+				proxy.fireEvent("bufferUpdate", data);
+			}
+			
 		}
 	}
 
@@ -540,6 +551,44 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			// resume position so that if the user then retries, playback will resume from the position to
 			// which they seeked.
 			updateResumePosition();
+		}
+
+		switch (reason) {
+			case Player.DISCONTINUITY_REASON_AD_INSERTION:
+				if (proxy.hasListeners("adInsertion")) {
+					proxy.fireEvent("adInsertion", null);
+				}
+				break;
+				
+			case Player.DISCONTINUITY_REASON_INTERNAL:
+				if (proxy.hasListeners("internalDiscontinuity")) {
+					proxy.fireEvent("internalDiscontinuity", null);
+				}
+				break;
+				
+			case Player.DISCONTINUITY_REASON_PERIOD_TRANSITION:
+				if (proxy.hasListeners("periodTransition")) {
+					proxy.fireEvent("periodTransition", null);
+				}
+				break;
+				
+			case Player.DISCONTINUITY_REASON_SEEK:
+				if (proxy.hasListeners("willSeek")) {
+					proxy.fireEvent("willSeek", null);
+				}
+				if (proxy.hasListeners("seek")) {
+					proxy.fireEvent("seek", null);
+				}
+				break;
+				
+			case Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT:
+				if (proxy.hasListeners("seekAdjustment")) {
+					proxy.fireEvent("seekAdjustment", null);
+				}
+				break;
+
+			default:
+				break;
 		}
 	}
 
@@ -592,6 +641,15 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	@Override
 	public void onSeekProcessed() {
 		Log.d(TAG, "seekProcessed");
+		if (proxy.hasListeners("didSeek")) {
+			proxy.fireEvent("didSeek", null);
+		}
+		if (proxy.hasListeners("positionUpdate")) {
+			KrollDict data = new KrollDict();
+			// https://github.com/clappr/clappr-ios/blob/dev/Sources/Clappr_iOS/Classes/Plugin/Playback/AVFoundationPlayback.swift#L284
+			data.put("position", player.getContentPosition());
+			proxy.fireEvent("positionUpdate", data);
+		}
 	}
 
 	@Override

@@ -69,7 +69,21 @@ function play(options) {
     'playbackstate',
     'playing',
     'postlayout',
-    'preload'
+    'preload',
+
+    'bufferUpdate',
+    'positionUpdate',
+    'ready',
+    'stalled',
+    'didComplete',
+    'willPlay',
+    'willPause',
+    'didPause',
+    'willStop',
+    'didStop',
+    'seek',
+    'willSeek',
+    'didSeek'
   ];
 
   PlayerEvents.forEach(function(event) {
