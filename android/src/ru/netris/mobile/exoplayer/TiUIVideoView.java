@@ -44,7 +44,6 @@ import android.widget.MediaController;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -97,8 +96,8 @@ import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 
-public class TiUIVideoView extends TiUIView implements EventListener,
-		PlaybackControlView.VisibilityListener, MetadataRenderer.Output
+public class TiUIVideoView
+	extends TiUIView implements EventListener, PlaybackControlView.VisibilityListener, MetadataRenderer.Output
 
 {
 	private static final String TAG = "TiUIVideoView";
@@ -248,7 +247,6 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	{
 		return player;
 	}
-
 
 	// PlaybackControlView.VisibilityListener implementation
 	@Override
@@ -460,21 +458,20 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			Exception cause = e.getRendererException();
 			if (cause instanceof DecoderInitializationException) {
 				// Special case for decoder initialization failures.
-				DecoderInitializationException decoderInitializationException =
-						(DecoderInitializationException) cause;
+				DecoderInitializationException decoderInitializationException = (DecoderInitializationException) cause;
 				if (decoderInitializationException.decoderName == null) {
 					if (decoderInitializationException.getCause() instanceof DecoderQueryException) {
 						errorString = activity.getString(R.string.error_querying_decoders);
 					} else if (decoderInitializationException.secureDecoderRequired) {
 						errorString = activity.getString(R.string.error_no_secure_decoder,
-								decoderInitializationException.mimeType);
+														 decoderInitializationException.mimeType);
 					} else {
-						errorString = activity.getString(R.string.error_no_decoder,
-								decoderInitializationException.mimeType);
+						errorString =
+							activity.getString(R.string.error_no_decoder, decoderInitializationException.mimeType);
 					}
 				} else {
 					errorString = activity.getString(R.string.error_instantiating_decoder,
-							decoderInitializationException.decoderName);
+													 decoderInitializationException.decoderName);
 				}
 			}
 		}
@@ -488,21 +485,6 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		if (proxy != null) {
 			proxy.onPlaybackError(e.type, errorString);
 		}
-
-//
-//		if (errorString != null) {
-//			showToast(errorString);
-//		}
-//		inErrorState = true;
-//		if (isBehindLiveWindow(e)) {
-//			clearResumePosition();
-//			initializePlayer();
-//		} else {
-//			updateResumePosition();
-////			updateButtonVisibilities();  //debug buttons
-////			showControls();              //debug controls
-//		}
-
 	}
 
 	@Override
@@ -533,7 +515,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	}
 
 	@Override
-	public void onPositionDiscontinuity(@Player.DiscontinuityReason int reason) {
+	public void onPositionDiscontinuity(@Player.DiscontinuityReason int reason)
+	{
 		Log.d(TAG, "positionDiscontinuity [" + getDiscontinuityReasonString(reason) + "]");
 		if (inErrorState) {
 			// This will only occur if the user has performed a seek whilst in the error state. Update the
@@ -550,13 +533,13 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	}
 
 	@Override
-	public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+	public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled)
+	{
 		Log.d(TAG, "shuffleModeEnabled [" + shuffleModeEnabled + "]");
 	}
 
 	@Override
-	public void onTimelineChanged(Timeline timeline, Object manifest,
-	                              @Player.TimelineChangeReason int reason)
+	public void onTimelineChanged(Timeline timeline, Object manifest, @Player.TimelineChangeReason int reason)
 	{
 		Log.d(TAG, "onTimelineChanged (" + reason + ")");
 	}
@@ -568,16 +551,15 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		Log.d(TAG, "onTracksChanged");
 		MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
 		try {
-			JSONObject trackInfo =
-					ModuleUtil.buildTrackInfoJSONObject(mappedTrackInfo, trackSelections, player);
+			JSONObject trackInfo = ModuleUtil.buildTrackInfoJSONObject(mappedTrackInfo, trackSelections, player);
 			if (trackGroups != lastSeenTrackGroupArray) {
 				if (mappedTrackInfo != null) {
 					if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_VIDEO)
-							== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
+						== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 						trackInfo.put("unsupportedVideo", true);
 					}
 					if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_AUDIO)
-							== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
+						== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 						trackInfo.put("unsupportedAudio", true);
 					}
 				}
@@ -590,7 +572,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	}
 
 	@Override
-	public void onSeekProcessed() {
+	public void onSeekProcessed()
+	{
 		Log.d(TAG, "seekProcessed");
 	}
 
@@ -650,20 +633,20 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 			}
 			DrmSessionManager<FrameworkMediaCrypto> drmSessionManager = null;
 			if (drmSchemeUuid != null) {
-				String drmLicenseUrl =
-						TiConvert.toString(proxy.getProperty(TiExoplayerModule.DRM_LICENSE_URL));
-				String[] keyRequestPropertiesArray = TiConvert.toStringArray((Object[]) proxy.getProperty(
-						TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES));
+				String drmLicenseUrl = TiConvert.toString(proxy.getProperty(TiExoplayerModule.DRM_LICENSE_URL));
+				String[] keyRequestPropertiesArray =
+					TiConvert.toStringArray((Object[]) proxy.getProperty(TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES));
 				int errorStringId = R.string.error_drm_unknown;
 				if (Util.SDK_INT < 18) {
 					errorStringId = R.string.error_drm_not_supported;
 				} else {
 					try {
-						drmSessionManager = buildDrmSessionManagerV18(drmSchemeUuid, drmLicenseUrl,
-								keyRequestPropertiesArray);
+						drmSessionManager =
+							buildDrmSessionManagerV18(drmSchemeUuid, drmLicenseUrl, keyRequestPropertiesArray);
 					} catch (UnsupportedDrmException e) {
 						errorStringId = e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
-								? R.string.error_drm_unsupported_scheme : R.string.error_drm_unknown;
+											? R.string.error_drm_unsupported_scheme
+											: R.string.error_drm_unknown;
 					}
 				}
 				if (drmSessionManager == null) {
@@ -674,16 +657,15 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 
 			boolean preferExtensionDecoders = false;
 			if (proxy.hasProperty(TiExoplayerModule.PREFER_EXTENSION_DECODERS)) {
-				preferExtensionDecoders = TiConvert.toBoolean(
-						proxy.getProperty(TiExoplayerModule.PREFER_EXTENSION_DECODERS), false);
+				preferExtensionDecoders =
+					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PREFER_EXTENSION_DECODERS), false);
 			}
 			// All extension renderer modules in lib, so default MODE_ON
-			@DefaultRenderersFactory.ExtensionRendererMode int extensionRendererMode =
-					preferExtensionDecoders
-							? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
-							: DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON;
-			DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(activity,
-					drmSessionManager, extensionRendererMode);
+			@DefaultRenderersFactory.ExtensionRendererMode
+			int extensionRendererMode = preferExtensionDecoders ? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
+																: DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON;
+			DefaultRenderersFactory renderersFactory =
+				new DefaultRenderersFactory(activity, drmSessionManager, extensionRendererMode);
 
 			player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector);
 			player.addListener(this);
@@ -739,7 +721,7 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 
 		player.prepare(mediaSource, !haveResumePosition, false);
 		inErrorState = false;
-//		updateButtonVisibilities();  //debug buttons
+		//		updateButtonVisibilities();  //debug buttons
 	}
 
 	public void setTrackSelectionOverride(int rendererIndex, int groupIndex, int[] tracks)
@@ -747,9 +729,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		MappedTrackInfo trackInfo = trackSelector.getCurrentMappedTrackInfo();
 		TrackGroupArray trackGroups = trackInfo.getTrackGroups(rendererIndex);
 		SelectionOverride override = trackSelector.getSelectionOverride(rendererIndex, trackGroups);
-		TrackSelection.Factory factory = tracks.length == 1
-				? fixedTrackSelectionFactory
-				: adaptiveTrackSelectionFactory;
+		TrackSelection.Factory factory =
+			tracks.length == 1 ? fixedTrackSelectionFactory : adaptiveTrackSelectionFactory;
 		override = new SelectionOverride(factory, groupIndex, tracks);
 		trackSelector.setRendererDisabled(rendererIndex, false);
 		trackSelector.setSelectionOverride(rendererIndex, trackGroups, override);
@@ -809,41 +790,37 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		resumePosition = Math.max(0, player.getContentPosition());
 	}
 
-	private DrmSessionManager<FrameworkMediaCrypto> buildDrmSessionManagerV18(UUID uuid,
-      String licenseUrl, String[] keyRequestPropertiesArray) throws UnsupportedDrmException
+	private DrmSessionManager<FrameworkMediaCrypto> buildDrmSessionManagerV18(UUID uuid, String licenseUrl,
+																			  String[] keyRequestPropertiesArray)
+		throws UnsupportedDrmException
 	{
-		HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl,
-				buildHttpDataSourceFactory(false));
+		HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl, buildHttpDataSourceFactory(false));
 		if (keyRequestPropertiesArray != null) {
 			for (int i = 0; i < keyRequestPropertiesArray.length - 1; i += 2) {
-				drmCallback.setKeyRequestProperty(keyRequestPropertiesArray[i],
-						keyRequestPropertiesArray[i + 1]);
+				drmCallback.setKeyRequestProperty(keyRequestPropertiesArray[i], keyRequestPropertiesArray[i + 1]);
 			}
 		}
-		return new DefaultDrmSessionManager<>(uuid, FrameworkMediaDrm.newInstance(uuid), drmCallback,
-				null, mainHandler, eventLogger);
+		return new DefaultDrmSessionManager<>(uuid, FrameworkMediaDrm.newInstance(uuid), drmCallback, null, mainHandler,
+											  eventLogger);
 	}
 
-	private MediaSource buildMediaSource(
-			Uri uri,
-			Object overrideContentType,
-			@Nullable Handler handler,
-			@Nullable MediaSourceEventListener listener)
+	private MediaSource buildMediaSource(Uri uri, Object overrideContentType, @Nullable Handler handler,
+										 @Nullable MediaSourceEventListener listener)
 	{
-		int type = overrideContentType == null ? Util.inferContentType(uri)
-				: TiConvert.toInt(overrideContentType);
+		int type = overrideContentType == null ? Util.inferContentType(uri) : TiConvert.toInt(overrideContentType);
 		switch (type) {
 			case C.TYPE_SS:
 				return new SsMediaSource(uri, buildDataSourceFactory(false),
-						new DefaultSsChunkSource.Factory(mediaDataSourceFactory), handler, listener);
+										 new DefaultSsChunkSource.Factory(mediaDataSourceFactory), handler, listener);
 			case C.TYPE_DASH:
 				return new DashMediaSource(uri, buildDataSourceFactory(false),
-						new DefaultDashChunkSource.Factory(mediaDataSourceFactory), handler, listener);
+										   new DefaultDashChunkSource.Factory(mediaDataSourceFactory), handler,
+										   listener);
 			case C.TYPE_HLS:
 				return new HlsMediaSource(uri, mediaDataSourceFactory, handler, listener);
 			case C.TYPE_OTHER:
 				return new ExtractorMediaSource.Factory(mediaDataSourceFactory)
-						.createMediaSource(uri, handler, listener);
+					.createMediaSource(uri, handler, listener);
 			default: {
 				throw new IllegalStateException("Unsupported type: " + type);
 			}
@@ -872,28 +849,28 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 		// The ads loader is reused for multiple playbacks, so that ad playback can resume.
 		Class<?> loaderClass = Class.forName("com.google.android.exoplayer2.ext.ima.ImaAdsLoader");
 		if (adsLoader == null) {
-			adsLoader = (AdsLoader) loaderClass.getConstructor(Context.class, Uri.class)
-					.newInstance(activity, adTagUri);
+			adsLoader =
+				(AdsLoader) loaderClass.getConstructor(Context.class, Uri.class).newInstance(activity, adTagUri);
 			adUiViewGroup = new FrameLayout(activity);
 			// The demo app has a non-null overlay frame layout.
 			videoView.getOverlayFrameLayout().addView(adUiViewGroup);
 		}
-		AdsMediaSource.MediaSourceFactory adMediaSourceFactory =
-				new AdsMediaSource.MediaSourceFactory() {
-					@Override
-					public MediaSource createMediaSource(
-							Uri uri, @Nullable Handler handler, @Nullable MediaSourceEventListener listener) {
-						return TiUIVideoView.this.buildMediaSource(
-								uri, /* overrideExtension= */ null, handler, listener);
-					}
+		AdsMediaSource.MediaSourceFactory adMediaSourceFactory = new AdsMediaSource.MediaSourceFactory() {
+			@Override
+			public MediaSource createMediaSource(Uri uri, @Nullable Handler handler,
+												 @Nullable MediaSourceEventListener listener)
+			{
+				return TiUIVideoView.this.buildMediaSource(uri, /* overrideExtension= */ null, handler, listener);
+			}
 
-					@Override
-					public int[] getSupportedTypes() {
-						return new int[] {C.TYPE_DASH, C.TYPE_SS, C.TYPE_HLS, C.TYPE_OTHER};
-					}
-				};
-		return new AdsMediaSource(
-				mediaSource, adMediaSourceFactory, adsLoader, adUiViewGroup, mainHandler, eventLogger);
+			@Override
+			public int[] getSupportedTypes()
+			{
+				return new int[] { C.TYPE_DASH, C.TYPE_SS, C.TYPE_HLS, C.TYPE_OTHER };
+			}
+		};
+		return new AdsMediaSource(mediaSource, adMediaSourceFactory, adsLoader, adUiViewGroup, mainHandler,
+								  eventLogger);
 	}
 
 	/**
@@ -910,8 +887,8 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 
 	private HttpDataSource.Factory buildHttpDataSourceFactory(DefaultBandwidthMeter bandwidthMeter)
 	{
-		return new DefaultHttpDataSourceFactory(
-				Util.getUserAgent(activity, TiExoplayerModule.MODULE_NAME), bandwidthMeter);
+		return new DefaultHttpDataSourceFactory(Util.getUserAgent(activity, TiExoplayerModule.MODULE_NAME),
+												bandwidthMeter);
 	}
 
 	/**
@@ -923,12 +900,12 @@ public class TiUIVideoView extends TiUIView implements EventListener,
 	 */
 	private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter)
 	{
-		return new DefaultDataSourceFactory(TiApplication.getInstance(),
-				useBandwidthMeter ? BANDWIDTH_METER : null,
-				buildHttpDataSourceFactory(useBandwidthMeter));
+		return new DefaultDataSourceFactory(TiApplication.getInstance(), useBandwidthMeter ? BANDWIDTH_METER : null,
+											buildHttpDataSourceFactory(useBandwidthMeter));
 	}
 
-	private static String getDiscontinuityReasonString(@Player.DiscontinuityReason int reason) {
+	private static String getDiscontinuityReasonString(@Player.DiscontinuityReason int reason)
+	{
 		switch (reason) {
 			case Player.DISCONTINUITY_REASON_PERIOD_TRANSITION:
 				return "PERIOD_TRANSITION";

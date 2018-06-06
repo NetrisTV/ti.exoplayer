@@ -36,19 +36,19 @@ final class ModuleUtil
 {
 
 	public static JSONObject buildTrackInfoJSONObject(MappedTrackInfo mappedTrackInfo,
-	                                                  TrackSelectionArray trackSelections,
-	                                                  SimpleExoPlayer player) throws JSONException
+													  TrackSelectionArray trackSelections, SimpleExoPlayer player)
+		throws JSONException
 	{
 		JSONObject trackInfo = new JSONObject();
 		JSONArray renderers = new JSONArray();
 		trackInfo.put("renderers", renderers);
 		if (mappedTrackInfo != null) {
 			if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_VIDEO)
-					== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
+				== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 				trackInfo.put("unsupportedVideo", true);
 			}
 			if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_AUDIO)
-					== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
+				== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 				trackInfo.put("unsupportedAudio", true);
 			}
 
@@ -67,8 +67,7 @@ final class ModuleUtil
 						if (trackGroup.length < 2) {
 							group.put("adaptive", RendererCapabilities.ADAPTIVE_NOT_SUPPORTED);
 						} else {
-							group.put("adaptive",
-									mappedTrackInfo.getAdaptiveSupport(rendererIndex, groupIndex, false));
+							group.put("adaptive", mappedTrackInfo.getAdaptiveSupport(rendererIndex, groupIndex, false));
 						}
 						JSONArray tracks = new JSONArray();
 						for (int trackIndex = 0; trackIndex < trackGroup.length; trackIndex++) {
@@ -78,7 +77,7 @@ final class ModuleUtil
 							track.put("index", trackIndex);
 							track.put("format", buildFormatJSONObject(trackGroup.getFormat(trackIndex)));
 							track.put("supported",
-									mappedTrackInfo.getTrackFormatSupport(rendererIndex, groupIndex, trackIndex));
+									  mappedTrackInfo.getTrackFormatSupport(rendererIndex, groupIndex, trackIndex));
 							tracks.put(track);
 						}
 						group.put("tracks", tracks);
@@ -112,7 +111,7 @@ final class ModuleUtil
 						JSONObject track = new JSONObject();
 						track.put("enabled", false);
 						track.put("index", trackIndex);
-						track.put("format",buildFormatJSONObject(trackGroup.getFormat(trackIndex)));
+						track.put("format", buildFormatJSONObject(trackGroup.getFormat(trackIndex)));
 						track.put("supported", RendererCapabilities.FORMAT_UNSUPPORTED_TYPE);
 						tracks.put(track);
 					}
@@ -131,32 +130,18 @@ final class ModuleUtil
 		JSONObject jsonFormat = new JSONObject();
 		jsonFormat.put("mimeType", format.sampleMimeType);
 		jsonFormat.put("id", format.id == null ? JSONObject.NULL : format.id);
-		jsonFormat.put("bitrate",
-				format.bitrate == Format.NO_VALUE ? JSONObject.NULL : format.bitrate);
+		jsonFormat.put("bitrate", format.bitrate == Format.NO_VALUE ? JSONObject.NULL : format.bitrate);
 		if (MimeTypes.isVideo(format.sampleMimeType)) {
-			jsonFormat.put("width",
-					format.width == Format.NO_VALUE ? JSONObject.NULL : format.width);
-			jsonFormat.put("height",
-					format.height == Format.NO_VALUE ? JSONObject.NULL : format.height);
+			jsonFormat.put("width", format.width == Format.NO_VALUE ? JSONObject.NULL : format.width);
+			jsonFormat.put("height", format.height == Format.NO_VALUE ? JSONObject.NULL : format.height);
 
 		} else if (MimeTypes.isAudio(format.sampleMimeType)) {
 			jsonFormat.put("channelCount",
-					format.channelCount == Format.NO_VALUE
-							? JSONObject.NULL
-							: format.channelCount);
-			jsonFormat.put("sampleRate",
-					format.sampleRate == Format.NO_VALUE
-							? JSONObject.NULL
-							: format.sampleRate);
-			jsonFormat.put("language",
-					TextUtils.isEmpty(format.language)
-							? JSONObject.NULL
-							: format.language);
+						   format.channelCount == Format.NO_VALUE ? JSONObject.NULL : format.channelCount);
+			jsonFormat.put("sampleRate", format.sampleRate == Format.NO_VALUE ? JSONObject.NULL : format.sampleRate);
+			jsonFormat.put("language", TextUtils.isEmpty(format.language) ? JSONObject.NULL : format.language);
 		} else {
-			jsonFormat.put("language",
-					TextUtils.isEmpty(format.language)
-							? JSONObject.NULL
-							: format.language);
+			jsonFormat.put("language", TextUtils.isEmpty(format.language) ? JSONObject.NULL : format.language);
 		}
 		return jsonFormat;
 	}
@@ -207,11 +192,10 @@ final class ModuleUtil
 		return jsonMetadata;
 	}
 
-
-	private static boolean getTrackStatus(TrackSelection selection, TrackGroup group,
-	                                      int trackIndex) {
+	private static boolean getTrackStatus(TrackSelection selection, TrackGroup group, int trackIndex)
+	{
 		return selection != null && selection.getTrackGroup() == group
-				&& selection.indexOf(trackIndex) != C.INDEX_UNSET;
+			&& selection.indexOf(trackIndex) != C.INDEX_UNSET;
 	}
 
 	private ModuleUtil()

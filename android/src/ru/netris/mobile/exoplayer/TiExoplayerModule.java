@@ -17,7 +17,6 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.RendererCapabilities;
 
-
 @Kroll.module(name = "TiExoplayer", id = "ru.netris.mobile.exoplayer")
 public class TiExoplayerModule extends KrollModule
 {
@@ -110,11 +109,8 @@ public class TiExoplayerModule extends KrollModule
 	@Kroll.constant
 	public static final int ADAPTIVE_NOT_SUPPORTED = RendererCapabilities.ADAPTIVE_NOT_SUPPORTED;
 
-
 	public TiExoplayerModule()
 	{
 		super();
 	}
-
 }
-

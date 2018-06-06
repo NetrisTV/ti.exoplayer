@@ -85,8 +85,6 @@ public class TiExoplayerActivity extends Activity
 	public void onNewIntent(Intent intent)
 	{
 		Log.d(TAG, "onNewIntent");
-//		releasePlayer();
-//		clearResumePosition();
 		setIntent(intent);
 	}
 
@@ -159,5 +157,4 @@ public class TiExoplayerActivity extends Activity
 	{
 		lifecycleListener = listener;
 	}
-
 }
