@@ -142,7 +142,6 @@ public class TiUIVideoView
 	/**
 	 * Used when setting video view to one created by our fullscreen TiVideoActivity, in which
 	 * case we shouldn't create one of our own in this class.
-	 * @param vv instance of SimpleExoPlayerView created by TiExoplayerActivity
 	 */
 	public void setVideoViewFromActivityLayout(TiExoplayerActivity activity)
 	{
@@ -202,8 +201,8 @@ public class TiUIVideoView
 		// Proxy holds the repeat mode directly.
 		setRepeatMode(getPlayerProxy().getRepeatMode());
 
-		if (d.containsKey(TiC.PROPERTY_VOLUME)) {
-			player.setVolume(TiConvert.toFloat(d, TiC.PROPERTY_VOLUME, 1.0f));
+		if (d.containsKey(TiExoplayerModule.PROPERTY_LINEAR_GAIN)) {
+			player.setVolume(TiConvert.toFloat(d, TiExoplayerModule.PROPERTY_LINEAR_GAIN, 1.0f));
 		}
 		if (d.containsKey(TiC.PROPERTY_AUTOPLAY)) {
 			shouldAutoPlay = TiConvert.toBoolean(d, TiC.PROPERTY_AUTOPLAY);
@@ -227,7 +226,7 @@ public class TiUIVideoView
 			}
 		} else if (key.equals(TiC.PROPERTY_SCALING_MODE)) {
 			setScalingMode(TiConvert.toInt(newValue));
-		} else if (key.equals(TiC.PROPERTY_VOLUME)) {
+		} else if (key.equals(TiExoplayerModule.PROPERTY_LINEAR_GAIN)) {
 			player.setVolume(TiConvert.toFloat(newValue));
 		} else if (key.equals(TiC.PROPERTY_REPEAT_MODE)) {
 			setRepeatMode(TiConvert.toInt(newValue));

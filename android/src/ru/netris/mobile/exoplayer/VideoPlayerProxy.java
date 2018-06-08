@@ -32,8 +32,10 @@ import ti.modules.titanium.media.TiThumbnailRetriever;
 import ti.modules.titanium.media.TiThumbnailRetriever.ThumbnailResponseHandler;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
+import android.database.ContentObserver;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
@@ -54,7 +56,7 @@ import com.google.android.exoplayer2.util.Util;
 		TiExoplayerModule.DRM_LICENSE_URL,
 		TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES,
 		TiExoplayerModule.PREFER_EXTENSION_DECODERS,
-		TiC.PROPERTY_VOLUME, TiC.PROPERTY_REPEAT_MODE
+		TiExoplayerModule.PROPERTY_LINEAR_GAIN, TiC.PROPERTY_REPEAT_MODE
 })
 // clang-format on
 public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifecycleEvent
@@ -91,16 +93,45 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	// Used only if TiExoplayerActivity is used (fullscreen == true)
 	private Handler videoActivityHandler;
 	private WeakReference<Activity> activityListeningTo = null;
+	private AudioManager audioManager =
+		(AudioManager) TiApplication.getAppRootOrCurrentActivity().getSystemService(Context.AUDIO_SERVICE);
 
 	private TiThumbnailRetriever mTiThumbnailRetriever;
+	private SettingsContentObserver mSettingsContentObserver;
 
 	public VideoPlayerProxy()
 	{
 		super();
-		defaultValues.put(TiC.PROPERTY_VOLUME, 1.0f);
+		defaultValues.put(TiExoplayerModule.PROPERTY_LINEAR_GAIN, 1.0f);
 		defaultValues.put(TiC.PROPERTY_SHOWS_CONTROLS, true);
 		defaultValues.put(TiC.PROPERTY_AUTOPLAY, true);
 		defaultValues.put(TiC.PROPERTY_MEDIA_CONTROL_STYLE, MediaModule.VIDEO_CONTROL_DEFAULT);
+	}
+
+	public class SettingsContentObserver extends ContentObserver
+	{
+		int lastVolumeValue;
+		public SettingsContentObserver(Handler handler)
+		{
+			super(handler);
+			lastVolumeValue = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+		}
+
+		@Override
+		public void onChange(boolean selfChange)
+		{
+			super.onChange(selfChange);
+			if (audioManager == null) {
+				return;
+			}
+			int current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+			if (current != lastVolumeValue) {
+				lastVolumeValue = current;
+				int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+				float volume = (float) (current) / max;
+				onVolumeChanged(volume);
+			}
+		}
 	}
 
 	@Override
@@ -133,10 +164,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	 * a TiUIVideoView so we have on common interface to the VideoView
 	 * and so we can handle child views in our standard way without any
 	 * extra code beyond this here.
-	 *
-	 * @param layout The content view of the TiVideoActivity. It already contains a VideoView.
 	 */
-	//
 	// a TiUIVideoView so we have one common channel to the VideoView
 	private void setVideoViewFromActivity(TiExoplayerActivity activity)
 	{
@@ -195,8 +223,6 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 
 	/**
 	 * Create handler used for communication from TiExoplayerActivity to this proxy.
-	 *
-	 * @return
 	 */
 	private Handler createControlHandler()
 	{
@@ -705,6 +731,9 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 				videoView.initializePlayer();
 			}
 		}
+		mSettingsContentObserver = new SettingsContentObserver(new Handler());
+		activity.getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true,
+															  mSettingsContentObserver);
 	}
 
 	@Override
@@ -779,6 +808,9 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 
 		// Cancel any Thumbnail requests and releasing TiMediaMetadataRetriver resource
 		cancelAllThumbnailImageRequests();
+		activity.getContentResolver().unregisterContentObserver(mSettingsContentObserver);
+		mSettingsContentObserver = null;
+		audioManager = null;
 	}
 
 	@Kroll.method
@@ -833,6 +865,35 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 			mTiThumbnailRetriever.cancelAnyRequestsAndRelease();
 			mTiThumbnailRetriever = null;
 		}
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.setProperty
+	public void setVolume(float volume)
+	// clang-format on
+	{
+		int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		int intVolume = (int) (max * volume);
+		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, intVolume, 0);
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.getProperty
+	public float getVolume()
+	// clang-format on
+	{
+		int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		int current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+		return (float) (current) / max;
+	}
+
+	private void onVolumeChanged(float volume)
+	{
+		KrollDict data = new KrollDict();
+		data.put("volume", volume);
+		fireEvent(TiExoplayerModule.EVENT_VOLUME_CHANGE, data);
 	}
 
 	/**

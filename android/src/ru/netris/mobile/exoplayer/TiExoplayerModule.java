@@ -33,6 +33,9 @@ public class TiExoplayerModule extends KrollModule
 
 	public static final String EVENT_TRACKS_CHANGED = "tracksChanged";
 	public static final String EVENT_METADATA = "metadata";
+	public static final String EVENT_VOLUME_CHANGE = "volumechange";
+
+	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
 
 	@Kroll.constant
 	public static final int EXCEPTION_TYPE_SOURCE = ExoPlaybackException.TYPE_SOURCE;

@@ -52,6 +52,10 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `setTrackSelectionOverride`: new method [`MappingTrackSelector.setSelectionOverride`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/trackselection/MappingTrackSelector.html#setSelectionOverride-int-com.google.android.exoplayer2.source.TrackGroupArray-com.google.android.exoplayer2.trackselection.MappingTrackSelector.SelectionOverride-)
 * `clearTrackSelectionOverrides`: new method [`MappingTrackSelector.clearSelectionOverrides`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/trackselection/MappingTrackSelector.html#clearSelectionOverrides-int-)
 * `setRendererDisabled`: new method [`MappingTrackSelector.setRendererDisabled`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/trackselection/MappingTrackSelector.html#setRendererDisabled-int-boolean-)
+* `setVolume`: new method. Sets the value of the `volume` property.
+* `getVolume`: new method. Gets the value of the `volume` property.
+* `setLinearGain`: new method. Sets the value of the `linearGain` property.
+* `getLinearGain`: new method. Gets the value of the `linearGain` property.
 
 ### Events
 * `durationAvailable`: removed (was deprecated, use `durationavailable`)
@@ -59,6 +63,7 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `error`: removed property `code`, added property `type` (`ExoPlayer.EXCEPTION_TYPE_*`)
 * `metadata`: new event, property `metadata`
 * `tracksChanged`: new event, property `trackInfo`
+* `volumechange`: new event, property `volume`. Fired when the volume on [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC) changes.
 
 ### Properties
 * `contentType`: one of `ExoPlayer.CONTENT_TYPE_*`
@@ -67,6 +72,8 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `drmKeyRequestProperties`
 * `adTagUri`
 * `showsControls`: [`videoPlayer.showsControls`](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media.VideoPlayer-property-showsControls)
+* `volume`: Ajusts volume of [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC)
+* `linearGain`: Ajusts player [volume](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/SimpleExoPlayer.html#setVolume-float-), with 0 being silence and 1 being unity gain. Default value: 1
 
 ## Usage
 
