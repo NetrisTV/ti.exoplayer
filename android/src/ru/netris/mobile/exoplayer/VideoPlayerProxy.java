@@ -37,6 +37,7 @@ import android.content.Intent;
 import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
@@ -172,6 +173,11 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		view = tiView;
 		tiView.setVideoViewFromActivityLayout(activity);
 		realizeViews(tiView);
+		if (mSettingsContentObserver == null) {
+			mSettingsContentObserver = new SettingsContentObserver(new Handler());
+			activity.getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true,
+																  mSettingsContentObserver);
+		}
 	}
 
 	@Override
@@ -723,6 +729,16 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	}
 
 	@Override
+	public void onCreate(Activity activity, Bundle bundle)
+	{
+		if (mSettingsContentObserver == null) {
+			mSettingsContentObserver = new SettingsContentObserver(new Handler());
+			activity.getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true,
+																  mSettingsContentObserver);
+		}
+	}
+
+	@Override
 	public void onStart(Activity activity)
 	{
 		TiUIVideoView videoView = getVideoView();
@@ -731,9 +747,6 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 				videoView.initializePlayer();
 			}
 		}
-		mSettingsContentObserver = new SettingsContentObserver(new Handler());
-		activity.getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true,
-															  mSettingsContentObserver);
 	}
 
 	@Override
@@ -808,8 +821,10 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 
 		// Cancel any Thumbnail requests and releasing TiMediaMetadataRetriver resource
 		cancelAllThumbnailImageRequests();
-		activity.getContentResolver().unregisterContentObserver(mSettingsContentObserver);
-		mSettingsContentObserver = null;
+		if (mSettingsContentObserver != null) {
+			activity.getContentResolver().unregisterContentObserver(mSettingsContentObserver);
+			mSettingsContentObserver = null;
+		}
 		audioManager = null;
 	}
 
