@@ -220,6 +220,7 @@ public class TiUIVideoView
 		if (key.equals(TiC.PROPERTY_URL) || key.equals(TiC.PROPERTY_CONTENT_URL)) {
 			if (newValue != null && !"".equals(newValue)) {
 				getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
+				readyFired = oldValue != null && oldValue.equals(newValue);
 				initializePlayer();
 			} else {
 				player.stop();
@@ -489,7 +490,7 @@ public class TiUIVideoView
 	@Override
 	public void onPlayerStateChanged(boolean playWhenReady, int playbackState)
 	{
-		Log.d(TAG, "onPlayerStateChanged " + playWhenReady + " " + playbackState);
+		Log.d(TAG, "onPlayerStateChanged playWhenReady: " + playWhenReady + ", playbackState: " + playbackState);
 		VideoPlayerProxy proxy = getPlayerProxy();
 		if (proxy == null) {
 			return;
