@@ -185,14 +185,13 @@ public class TiUIVideoView
 			activity = proxy.getActivity();
 			videoView = new SimpleExoPlayerView(activity);
 			initView();
+			getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 		}
 		super.processProperties(d);
 
 		if (videoView == null || player == null) {
 			return;
 		}
-
-		getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 
 		// Proxy holds the scaling mode directly.
 		setScalingMode(getPlayerProxy().getScalingMode());
@@ -220,10 +219,10 @@ public class TiUIVideoView
 		if (key.equals(TiC.PROPERTY_URL) || key.equals(TiC.PROPERTY_CONTENT_URL)) {
 			if (newValue != null && !"".equals(newValue)) {
 				getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
-				readyFired = oldValue != null && oldValue.equals(newValue);
+				readyFired = false;
 				initializePlayer();
 			} else {
-				player.stop();
+				stop();
 			}
 		} else if (key.equals(TiC.PROPERTY_SCALING_MODE)) {
 			setScalingMode(TiConvert.toInt(newValue));
