@@ -216,7 +216,7 @@ public class TiUIVideoView
 			return;
 		}
 
-		if (key.equals(TiC.PROPERTY_URL) || key.equals(TiC.PROPERTY_CONTENT_URL)) {
+		if (key.equals(TiC.PROPERTY_URL)) {
 			if (newValue != null && !"".equals(newValue)) {
 				getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 				readyFired = false;
@@ -612,6 +612,13 @@ public class TiUIVideoView
 	public void initializePlayer()
 	{
 		VideoPlayerProxy proxy = getPlayerProxy();
+		if (!proxy.hasPropertyAndNotNull(TiC.PROPERTY_URL)) {
+			return;
+		}
+		String uriString = TiConvert.toString(proxy.getProperty(TiC.PROPERTY_URL));
+		if (uriString == null) {
+			return;
+		}
 		boolean needNewPlayer = player == null;
 		if (needNewPlayer) {
 			readyFired = false;
@@ -678,10 +685,7 @@ public class TiUIVideoView
 			videoView.setPlayer(player);
 		}
 		player.setPlayWhenReady(shouldAutoPlay);
-		if (!proxy.hasProperty(TiC.PROPERTY_URL)) {
-			return;
-		}
-		Uri uri = Uri.parse(TiConvert.toString(proxy.getProperty(TiC.PROPERTY_URL)));
+		Uri uri = Uri.parse(uriString);
 		Object contentType = proxy.getProperty(TiExoplayerModule.CONTENT_TYPE);
 		MediaSource mediaSource = buildMediaSource(uri, contentType, mainHandler, eventLogger);
 		String adTagUriString = TiConvert.toString(proxy.getProperty(TiExoplayerModule.AD_TAG_URI_EXTRA));
