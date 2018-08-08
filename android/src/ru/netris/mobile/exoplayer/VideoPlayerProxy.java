@@ -728,6 +728,23 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		}
 	}
 
+	private void saveResumePosition(Activity activity)
+	{
+		if (activity.isFinishing()) {
+			// Forget any saved positions
+			setProperty(PROPERTY_SEEK_TO_ON_RESUME, 0);
+		} else {
+			// We're not finishing, so we might be coming back. Remember where we are.
+			if (view != null) {
+				int seekToOnResume = getCurrentPlaybackTime();
+				if (!hasPropertyAndNotNull(PROPERTY_SEEK_TO_ON_RESUME)
+					|| TiConvert.toInt(getProperty(PROPERTY_SEEK_TO_ON_RESUME)) == 0 || seekToOnResume != 0) {
+					setProperty(PROPERTY_SEEK_TO_ON_RESUME, seekToOnResume);
+				}
+			}
+		}
+	}
+
 	@Override
 	public void onCreate(Activity activity, Bundle bundle)
 	{
@@ -767,19 +784,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		TiUIVideoView videoView = getVideoView();
 		if (videoView != null) {
 			if (Util.SDK_INT <= 23) {
-				if (activity.isFinishing()) {
-					// Forget any saved positions
-					setProperty(PROPERTY_SEEK_TO_ON_RESUME, 0);
-				} else {
-					// We're not finishing, so we might be coming back. Remember where we are.
-					if (view != null) {
-						int seekToOnResume = getCurrentPlaybackTime();
-						setProperty(PROPERTY_SEEK_TO_ON_RESUME, seekToOnResume);
-						if (getPlaying()) {
-							pause();
-						}
-					}
-				}
+				saveResumePosition(activity);
 				videoView.releasePlayer();
 			}
 		}
@@ -791,6 +796,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		TiUIVideoView videoView = getVideoView();
 		if (videoView != null) {
 			if (Util.SDK_INT > 23) {
+				saveResumePosition(activity);
 				videoView.releasePlayer();
 			}
 		}
@@ -802,7 +808,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		boolean wasPlaying = getPlaying();
 		if (!wasPlaying) {
 			// Could be we've passed through onPause while finishing and paused playback.
-			if (hasProperty(PROPERTY_SEEK_TO_ON_RESUME)) {
+			if (activity.isFinishing() && hasProperty(PROPERTY_SEEK_TO_ON_RESUME)) {
 				wasPlaying = TiConvert.toInt(getProperty(PROPERTY_SEEK_TO_ON_RESUME)) > 0;
 				setProperty(PROPERTY_SEEK_TO_ON_RESUME, 0);
 			}

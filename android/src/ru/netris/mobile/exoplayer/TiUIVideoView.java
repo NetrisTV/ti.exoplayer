@@ -107,7 +107,7 @@ public class TiUIVideoView
 	private TrackGroupArray lastSeenTrackGroupArray;
 	private boolean readyFired = false;
 	private boolean shouldAutoPlay;
-	private int resumeWindow;
+	private int resumeWindow = C.INDEX_UNSET;
 	private long resumePosition;
 	private EventLogger eventLogger;
 	private SimpleExoPlayerView videoView;
@@ -217,6 +217,7 @@ public class TiUIVideoView
 		}
 
 		if (key.equals(TiC.PROPERTY_URL)) {
+			clearResumePosition();
 			if (newValue != null && !"".equals(newValue)) {
 				getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 				readyFired = false;
@@ -414,6 +415,7 @@ public class TiUIVideoView
 			return;
 		}
 		try {
+			updateResumePosition();
 			player.release();
 			player = null;
 		} catch (Exception e) {
@@ -707,24 +709,28 @@ public class TiUIVideoView
 		if (haveResumePosition) {
 			player.seekTo(resumeWindow, resumePosition);
 		} else {
-			int seekTo = 0;
-			Object initialPlaybackTime = proxy.getProperty(TiC.PROPERTY_INITIAL_PLAYBACK_TIME);
-			if (initialPlaybackTime != null) {
-				seekTo = TiConvert.toInt(initialPlaybackTime);
-				proxy.setProperty(TiC.PROPERTY_INITIAL_PLAYBACK_TIME, 0);
-			}
-			// Resuming from an activity pause?
-			Object seekToOnResume = proxy.getProperty(VideoPlayerProxy.PROPERTY_SEEK_TO_ON_RESUME);
-			if (seekToOnResume != null) {
-				seekTo = TiConvert.toInt(seekToOnResume);
-				proxy.setProperty(VideoPlayerProxy.PROPERTY_SEEK_TO_ON_RESUME, 0);
-			}
-			player.seekTo(seekTo);
+			player.seekTo(getInitialPosition());
+			haveResumePosition = true;
 		}
 
 		player.prepare(mediaSource, !haveResumePosition, false);
 		inErrorState = false;
 		//		updateButtonVisibilities();  //debug buttons
+	}
+
+	private int getInitialPosition()
+	{
+		int seekTo = 0;
+		Object initialPlaybackTime = proxy.getProperty(TiC.PROPERTY_INITIAL_PLAYBACK_TIME);
+		if (initialPlaybackTime != null) {
+			seekTo = TiConvert.toInt(initialPlaybackTime);
+		}
+		// Resuming from an activity pause?
+		Object seekToOnResume = proxy.getProperty(VideoPlayerProxy.PROPERTY_SEEK_TO_ON_RESUME);
+		if (seekToOnResume != null) {
+			seekTo = TiConvert.toInt(seekToOnResume);
+		}
+		return seekTo;
 	}
 
 	public void setTrackSelectionOverride(int rendererIndex, int groupIndex, int[] tracks)
@@ -790,7 +796,12 @@ public class TiUIVideoView
 	public void updateResumePosition()
 	{
 		resumeWindow = player.getCurrentWindowIndex();
-		resumePosition = Math.max(0, player.getContentPosition());
+		long currentPosition = player.getContentPosition();
+		if (currentPosition > 0) {
+			resumePosition = currentPosition;
+		} else {
+			resumePosition = getInitialPosition();
+		}
 	}
 
 	private DrmSessionManager<FrameworkMediaCrypto> buildDrmSessionManagerV18(UUID uuid, String licenseUrl,
