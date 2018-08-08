@@ -825,7 +825,6 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 			activity.getContentResolver().unregisterContentObserver(mSettingsContentObserver);
 			mSettingsContentObserver = null;
 		}
-		audioManager = null;
 	}
 
 	@Kroll.method
