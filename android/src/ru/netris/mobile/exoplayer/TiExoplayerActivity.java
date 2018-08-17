@@ -23,7 +23,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 public class TiExoplayerActivity extends Activity
 {
@@ -56,7 +56,7 @@ public class TiExoplayerActivity extends Activity
 		}
 
 		layout = new TiCompositeLayout(this);
-		layout.addView(new SimpleExoPlayerView(this), new TiCompositeLayout.LayoutParams());
+		layout.addView(new PlayerView(this), new TiCompositeLayout.LayoutParams());
 
 		setContentView(layout);
 

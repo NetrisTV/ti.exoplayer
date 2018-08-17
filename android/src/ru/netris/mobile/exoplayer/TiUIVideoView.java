@@ -87,7 +87,7 @@ import com.google.android.exoplayer2.trackselection.MappingTrackSelector.MappedT
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector.SelectionOverride;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlaybackControlView;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -110,7 +110,7 @@ public class TiUIVideoView
 	private int resumeWindow = C.INDEX_UNSET;
 	private long resumePosition;
 	private EventLogger eventLogger;
-	private SimpleExoPlayerView videoView;
+	private PlayerView videoView;
 	private MediaController mediaController;
 
 	private DataSource.Factory mediaDataSourceFactory;
@@ -150,8 +150,8 @@ public class TiUIVideoView
 		setNativeView(layout);
 		for (int i = 0; i < layout.getChildCount(); i++) {
 			View child = layout.getChildAt(i);
-			if (child instanceof SimpleExoPlayerView) {
-				videoView = (SimpleExoPlayerView) child;
+			if (child instanceof PlayerView) {
+				videoView = (PlayerView) child;
 				break;
 			}
 		}
@@ -183,7 +183,7 @@ public class TiUIVideoView
 	{
 		if (videoView == null) {
 			activity = proxy.getActivity();
-			videoView = new SimpleExoPlayerView(activity);
+			videoView = new PlayerView(activity);
 			initView();
 			getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 		}
