@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.exoplayer2.ui.PlayerView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:surface_type="surface_view" />

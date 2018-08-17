@@ -11,6 +11,7 @@ import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.TiLifecycle;
+import org.appcelerator.titanium.util.TiRHelper;
 import org.appcelerator.titanium.view.TiCompositeLayout;
 
 import android.app.Activity;
@@ -22,6 +23,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.view.LayoutInflater;
 
 import com.google.android.exoplayer2.ui.PlayerView;
 
@@ -56,7 +58,18 @@ public class TiExoplayerActivity extends Activity
 		}
 
 		layout = new TiCompositeLayout(this);
-		layout.addView(new PlayerView(this), new TiCompositeLayout.LayoutParams());
+		PlayerView videoView = null;
+		LayoutInflater inflater = LayoutInflater.from(this);
+		try {
+			int layout_player_view = TiRHelper.getResource("layout.player_view");
+			videoView = (PlayerView) inflater.inflate(layout_player_view, null, false);
+		} catch (TiRHelper.ResourceNotFoundException e) {
+			//Custom layout is not provided, it is ok.
+		}
+		if (videoView == null) {
+			videoView = new PlayerView(this);
+		}
+		layout.addView(videoView, new TiCompositeLayout.LayoutParams());
 
 		setContentView(layout);
 

@@ -16,6 +16,7 @@ import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.util.TiConvert;
+import org.appcelerator.titanium.util.TiRHelper;
 import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiUIView;
 
@@ -36,6 +37,7 @@ import android.os.Handler;
 import android.os.Messenger;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -142,6 +144,7 @@ public class TiUIVideoView
 	/**
 	 * Used when setting video view to one created by our fullscreen TiVideoActivity, in which
 	 * case we shouldn't create one of our own in this class.
+	 * @param activity instance TiExoplayerActivity
 	 */
 	public void setVideoViewFromActivityLayout(TiExoplayerActivity activity)
 	{
@@ -183,7 +186,16 @@ public class TiUIVideoView
 	{
 		if (videoView == null) {
 			activity = proxy.getActivity();
-			videoView = new PlayerView(activity);
+			LayoutInflater inflater = LayoutInflater.from(activity);
+			try {
+				int layout_player_view = TiRHelper.getResource("layout.player_view");
+				videoView = (PlayerView) inflater.inflate(layout_player_view, null, false);
+			} catch (TiRHelper.ResourceNotFoundException e) {
+				//Custom layout is not provided, it is ok.
+			}
+			if (videoView == null) {
+				videoView = new PlayerView(activity);
+			}
 			initView();
 			getPlayerProxy().fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 		}
