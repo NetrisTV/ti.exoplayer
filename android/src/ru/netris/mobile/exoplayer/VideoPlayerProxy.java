@@ -8,7 +8,6 @@
 package ru.netris.mobile.exoplayer;
 
 import java.lang.ref.WeakReference;
-import java.util.UUID;
 
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollFunction;
@@ -23,7 +22,6 @@ import org.appcelerator.titanium.TiLifecycle;
 import org.appcelerator.titanium.io.TitaniumBlob;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiUIView;
 
 import ti.modules.titanium.media.MediaModule;
@@ -41,17 +39,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.widget.FrameLayout;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.util.Util;
 
 // clang-format off
 @Kroll.proxy(creatableInModule = TiExoplayerModule.class, propertyAccessors = {
 		TiC.PROPERTY_URL, TiC.PROPERTY_INITIAL_PLAYBACK_TIME, TiC.PROPERTY_DURATION,
 		TiC.PROPERTY_AUTOPLAY, TiC.PROPERTY_END_PLAYBACK_TIME, TiC.PROPERTY_PLAYABLE_DURATION,
+		TiExoplayerModule.PROPERTY_SURFACE_TYPE,
 		TiExoplayerModule.CONTENT_TYPE,
 		TiExoplayerModule.DRM_SCHEME_UUID_EXTRA,
 		TiExoplayerModule.DRM_LICENSE_URL,
@@ -103,6 +99,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	public VideoPlayerProxy()
 	{
 		super();
+		defaultValues.put(TiExoplayerModule.PROPERTY_SURFACE_TYPE, TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW);
 		defaultValues.put(TiExoplayerModule.PROPERTY_LINEAR_GAIN, 1.0f);
 		defaultValues.put(TiC.PROPERTY_SHOWS_CONTROLS, true);
 		defaultValues.put(TiC.PROPERTY_AUTOPLAY, true);
@@ -222,6 +219,8 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		if (options.containsKey(TiC.PROPERTY_BACKGROUND_COLOR)) {
 			intent.putExtra(TiC.PROPERTY_BACKGROUND_COLOR, TiConvert.toColor(options, TiC.PROPERTY_BACKGROUND_COLOR));
 		}
+		intent.putExtra(TiExoplayerModule.PROPERTY_SURFACE_TYPE,
+						TiConvert.toInt(options, TiExoplayerModule.PROPERTY_SURFACE_TYPE));
 		videoActivityHandler = createControlHandler();
 		intent.putExtra(TiC.PROPERTY_MESSENGER, new Messenger(videoActivityHandler));
 		getActivity().startActivity(intent);

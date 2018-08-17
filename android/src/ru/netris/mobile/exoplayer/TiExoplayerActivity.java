@@ -60,8 +60,22 @@ public class TiExoplayerActivity extends Activity
 		layout = new TiCompositeLayout(this);
 		PlayerView videoView = null;
 		LayoutInflater inflater = LayoutInflater.from(this);
+		String path = "layout.player_view_surface_view";
+		if (intent.hasExtra(TiExoplayerModule.PROPERTY_SURFACE_TYPE)) {
+			int surfaceType = intent.getIntExtra(TiExoplayerModule.PROPERTY_SURFACE_TYPE,
+												 TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW);
+			if (surfaceType == TiExoplayerModule.SURFACE_TYPE_NONE) {
+				path = "layout.player_view_none";
+			} else if (surfaceType == TiExoplayerModule.SURFACE_TYPE_TEXTURE_VIEW) {
+				path = "layout.player_view_texture_view";
+			} else if (surfaceType != TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW) {
+				Log.e(TAG, "Wrong \"" + TiExoplayerModule.PROPERTY_SURFACE_TYPE + "\" property value:" + surfaceType
+							   + ". Fallback to SurfaceView");
+			}
+		}
+
 		try {
-			int layout_player_view = TiRHelper.getResource("layout.player_view");
+			int layout_player_view = TiRHelper.getResource(path);
 			videoView = (PlayerView) inflater.inflate(layout_player_view, null, false);
 		} catch (TiRHelper.ResourceNotFoundException e) {
 			//Custom layout is not provided, it is ok.

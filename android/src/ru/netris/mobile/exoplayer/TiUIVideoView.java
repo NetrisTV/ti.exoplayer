@@ -186,9 +186,22 @@ public class TiUIVideoView
 	{
 		if (videoView == null) {
 			activity = proxy.getActivity();
+			String path = "layout.player_view_surface_view";
+			if (proxy.hasPropertyAndNotNull(TiExoplayerModule.PROPERTY_SURFACE_TYPE)) {
+				int surfaceType = TiConvert.toInt(proxy.getProperty(TiExoplayerModule.PROPERTY_SURFACE_TYPE),
+												  TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW);
+				if (surfaceType == TiExoplayerModule.SURFACE_TYPE_NONE) {
+					path = "layout.player_view_none";
+				} else if (surfaceType == TiExoplayerModule.SURFACE_TYPE_TEXTURE_VIEW) {
+					path = "layout.player_view_texture_view";
+				} else if (surfaceType != TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW) {
+					Log.e(TAG, "Wrong \"" + TiExoplayerModule.PROPERTY_SURFACE_TYPE + "\" property value:" + surfaceType
+								   + ". Fallback to SurfaceView");
+				}
+			}
 			LayoutInflater inflater = LayoutInflater.from(activity);
 			try {
-				int layout_player_view = TiRHelper.getResource("layout.player_view");
+				int layout_player_view = TiRHelper.getResource(path);
 				videoView = (PlayerView) inflater.inflate(layout_player_view, null, false);
 			} catch (TiRHelper.ResourceNotFoundException e) {
 				//Custom layout is not provided, it is ok.

@@ -36,6 +36,7 @@ public class TiExoplayerModule extends KrollModule
 	public static final String EVENT_VOLUME_CHANGE = "volumechange";
 
 	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
+	public static final String PROPERTY_SURFACE_TYPE = "surfaceType";
 
 	@Kroll.constant
 	public static final int EXCEPTION_TYPE_SOURCE = ExoPlaybackException.TYPE_SOURCE;
@@ -111,6 +112,15 @@ public class TiExoplayerModule extends KrollModule
 
 	@Kroll.constant
 	public static final int ADAPTIVE_NOT_SUPPORTED = RendererCapabilities.ADAPTIVE_NOT_SUPPORTED;
+
+	@Kroll.constant
+	public static final int SURFACE_TYPE_NONE = 0;
+
+	@Kroll.constant
+	public static final int SURFACE_TYPE_SURFACE_VIEW = 1;
+
+	@Kroll.constant
+	public static final int SURFACE_TYPE_TEXTURE_VIEW = 2;
 
 	public TiExoplayerModule()
 	{

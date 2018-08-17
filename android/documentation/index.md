@@ -43,6 +43,9 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `ExoPlayer.ADAPTIVE_SEAMLESS`: [`RendererCapabilities.ADAPTIVE_SEAMLESS`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/RendererCapabilities.html)
 * `ExoPlayer.ADAPTIVE_NOT_SEAMLESS`: [`RendererCapabilities.ADAPTIVE_NOT_SEAMLESS`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/RendererCapabilities.html)
 * `ExoPlayer.ADAPTIVE_NOT_SUPPORTED`: [`RendererCapabilities.ADAPTIVE_NOT_SUPPORTED`](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/RendererCapabilities.html)
+* `ExoPlayer.SURFACE_TYPE_NONE`
+* `ExoPlayer.SURFACE_TYPE_SURFACE_VIEW`
+* `ExoPlayer.SURFACE_TYPE_TEXTURE_VIEW`
 
 ## VideoPlayer API Difference
 ### Methods
@@ -74,6 +77,7 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `showsControls`: [`videoPlayer.showsControls`](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media.VideoPlayer-property-showsControls)
 * `volume`: Ajusts volume of [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC)
 * `linearGain`: Ajusts player [volume](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/SimpleExoPlayer.html#setVolume-float-), with 0 being silence and 1 being unity gain. Default value: 1
+* `surfaceType`: The type of surface view used for video playbacks. Valid values are `ExoPlayer.SURFACE_TYPE_*`.
 
 ## Usage
 
