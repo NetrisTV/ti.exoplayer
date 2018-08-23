@@ -42,6 +42,12 @@ Build
 ---------------
 `appc run -p android --build-only` from the `android` directory
 
+Known issues
+------------
+Application build could stuck on `"Running dexer"` step. To avoid this, increase max memory size for dexer with command:
+
+```ti config android.dx.maxMemory 2048M```
+
 Author
 ---------------
 Sergey Volkov <s.volkov@netris.ru>
