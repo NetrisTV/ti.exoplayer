@@ -40,6 +40,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.util.Util;
 
@@ -906,6 +907,41 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		int current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 		return (float) (current) / max;
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.getProperty
+	public KrollDict getNaturalSize()
+	// clang-format on
+	{
+		KrollDict d = new KrollDict();
+		d.put(TiC.PROPERTY_WIDTH, 0);
+		d.put(TiC.PROPERTY_HEIGHT, 0);
+		d.put(TiC.PROPERTY_ROTATION, 0);
+		d.put(TiExoplayerModule.EVENT_PROPERTY_PIXEL_RATIO, 0);
+		if (view != null) {
+			Format format = ((TiUIVideoView) view).getVideoFormat();
+			if (format != null) {
+				d.put(TiC.PROPERTY_WIDTH, format.width);
+				d.put(TiC.PROPERTY_HEIGHT, format.height);
+				d.put(TiC.PROPERTY_ROTATION, format.rotationDegrees);
+				d.put(TiExoplayerModule.EVENT_PROPERTY_PIXEL_RATIO, format.pixelWidthHeightRatio);
+			}
+		}
+		return d;
+	}
+
+	public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio)
+	{
+		KrollDict naturalSize = new KrollDict();
+		naturalSize.put(TiC.PROPERTY_WIDTH, width);
+		naturalSize.put(TiC.PROPERTY_HEIGHT, height);
+		naturalSize.put(TiC.PROPERTY_ROTATION, unappliedRotationDegrees);
+		naturalSize.put(TiExoplayerModule.EVENT_PROPERTY_PIXEL_RATIO, pixelWidthHeightRatio);
+		KrollDict data = new KrollDict();
+		data.put(TiExoplayerModule.PROPERTY_NATURAL_SIZE, naturalSize);
+		fireEvent(TiExoplayerModule.EVENT_NATURAL_SIZE_AVAILABLE, data);
 	}
 
 	private void onVolumeChanged(float volume)

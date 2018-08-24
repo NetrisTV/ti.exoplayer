@@ -61,12 +61,15 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `getLinearGain`: new method. Gets the value of the `linearGain` property.
 
 ### Events
-* `durationAvailable`: removed (was deprecated, use `durationavailable`)
-* `playbackState`: removed (was deprecated, use `playbackstate`)
-* `error`: removed property `code`, added property `type` (`ExoPlayer.EXCEPTION_TYPE_*`)
+* ~~`durationAvailable`~~: removed (was deprecated, use `durationavailable`)
+* ~~`playbackState`~~: removed (was deprecated, use `playbackstate`)
+* `error`: removed property ~~`code`~~, added property `type` (`ExoPlayer.EXCEPTION_TYPE_*`)
 * `metadata`: new event, property `metadata`
 * `tracksChanged`: new event, property `trackInfo`
 * `volumechange`: new event, property `volume`. Fired when the volume on [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC) changes.
+* `naturalsizeavailable`: new event, property `naturalSize`
+ (see [VideoRendererEventListener.onVideoSizeChanged](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/video/VideoRendererEventListener.html#onVideoSizeChanged-int-int-int-float-)).
+ Fired before a frame is rendered for the first time since setting the surface, and each time there's a change in the size, rotation or pixel aspect ratio of the video being rendered.
 
 ### Properties
 * `contentType`: one of `ExoPlayer.CONTENT_TYPE_*`
@@ -78,6 +81,12 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `volume`: Ajusts volume of [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC)
 * `linearGain`: Ajusts player [volume](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/SimpleExoPlayer.html#setVolume-float-), with 0 being silence and 1 being unity gain. Default value: 1
 * `surfaceType`: The type of surface view used for video playbacks. Valid values are `ExoPlayer.SURFACE_TYPE_*`.
+* `naturalSize`: Returns the natural size of the movie.
+ Returns a dictionary with properties `width`, `height`, `rotation` and `pixelRatio`
+ (see [Format](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/Format.html)).
+ Returns `0` for all properties if not known or applicable.
+ The naturalSizeAvailable event is fired when the natural size is known.
+
 
 ## Usage
 

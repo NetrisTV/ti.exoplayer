@@ -34,7 +34,11 @@ public class TiExoplayerModule extends KrollModule
 	public static final String EVENT_TRACKS_CHANGED = "tracksChanged";
 	public static final String EVENT_METADATA = "metadata";
 	public static final String EVENT_VOLUME_CHANGE = "volumechange";
+	public static final String EVENT_NATURAL_SIZE_AVAILABLE = "naturalsizeavailable";
 
+	public static final String EVENT_PROPERTY_PIXEL_RATIO = "pixelRatio";
+
+	public static final String PROPERTY_NATURAL_SIZE = "naturalSize";
 	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
 	public static final String PROPERTY_SURFACE_TYPE = "surfaceType";
 

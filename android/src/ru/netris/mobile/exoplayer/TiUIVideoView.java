@@ -39,6 +39,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
@@ -50,12 +51,14 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.ParserException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
@@ -97,9 +100,10 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
-public class TiUIVideoView
-	extends TiUIView implements EventListener, PlaybackControlView.VisibilityListener, MetadataRenderer.Output
+public class TiUIVideoView extends TiUIView implements EventListener, PlaybackControlView.VisibilityListener,
+													   MetadataRenderer.Output, VideoRendererEventListener
 
 {
 	private static final String TAG = "TiUIVideoView";
@@ -707,6 +711,7 @@ public class TiUIVideoView
 			player.addMetadataOutput(eventLogger);
 			player.setAudioDebugListener(eventLogger);
 			player.setVideoDebugListener(eventLogger);
+			player.setVideoDebugListener(this);
 
 			processProperties(getPlayerProxy().getProperties());
 			videoView.setPlayer(player);
@@ -785,6 +790,14 @@ public class TiUIVideoView
 	public void setRendererDisabled(int rendererIndex, boolean disabled)
 	{
 		trackSelector.setRendererDisabled(rendererIndex, disabled);
+	}
+
+	public Format getVideoFormat()
+	{
+		if (player != null) {
+			return player.getVideoFormat();
+		}
+		return null;
 	}
 
 	private void showToast(int messageId)
@@ -957,5 +970,47 @@ public class TiUIVideoView
 			default:
 				return "?";
 		}
+	}
+
+	// VideoRendererEventListener implementation
+
+	@Override
+	public void onVideoEnabled(DecoderCounters counters)
+	{
+	}
+
+	@Override
+	public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs,
+										  long initializationDurationMs)
+	{
+	}
+
+	@Override
+	public void onVideoInputFormatChanged(Format format)
+	{
+	}
+
+	@Override
+	public void onDroppedFrames(int count, long elapsedMs)
+	{
+	}
+
+	@Override
+	public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio)
+	{
+		if (proxy != null) {
+			((VideoPlayerProxy) proxy)
+				.onVideoSizeChanged(width, height, unappliedRotationDegrees, pixelWidthHeightRatio);
+		}
+	}
+
+	@Override
+	public void onRenderedFirstFrame(Surface surface)
+	{
+	}
+
+	@Override
+	public void onVideoDisabled(DecoderCounters counters)
+	{
 	}
 }
