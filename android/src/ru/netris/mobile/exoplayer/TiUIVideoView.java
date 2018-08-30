@@ -141,8 +141,10 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 	{
 		super(proxy);
 		TiCompositeLayout.LayoutParams params = getLayoutParams();
-		params.autoFillsHeight = true;
-		params.autoFillsWidth = true;
+		params.sizeOrFillHeightEnabled = true;
+		params.sizeOrFillWidthEnabled = true;
+		params.autoFillsHeight = false;
+		params.autoFillsWidth = false;
 	}
 
 	/**
