@@ -581,6 +581,9 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 	public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections)
 	{
 		Log.d(TAG, "onTracksChanged");
+		if (trackSelector == null) {
+			return;
+		}
 		MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
 		try {
 			JSONObject trackInfo = ModuleUtil.buildTrackInfoJSONObject(mappedTrackInfo, trackSelections, player);
