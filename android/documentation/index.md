@@ -63,7 +63,7 @@ The `ExoPlayer` variable is a reference to the Module object.
 ### Events
 * ~~`durationAvailable`~~: removed (was deprecated, use `durationavailable`)
 * ~~`playbackState`~~: removed (was deprecated, use `playbackstate`)
-* `error`: removed property ~~`code`~~, added property `type` (`ExoPlayer.EXCEPTION_TYPE_*`)
+* `error`: changed property `code` value (one of `ExoPlayer.EXCEPTION_TYPE_*`)
 * `metadata`: new event, property `metadata`
 * `tracksChanged`: new event, property `trackInfo`
 * `volumechange`: new event, property `volume`. Fired when the volume on [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC) changes.
@@ -85,7 +85,7 @@ The `ExoPlayer` variable is a reference to the Module object.
  Returns a dictionary with properties `width`, `height`, `rotation` and `pixelRatio`
  (see [Format](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/Format.html)).
  Returns `0` for all properties if not known or applicable.
- The naturalSizeAvailable event is fired when the natural size is known.
+ The `naturalsizeavailable` event is fired when the natural size is known.
 
 
 ## Usage

@@ -693,8 +693,8 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	{
 		firePlaybackState(MediaModule.VIDEO_PLAYBACK_STATE_INTERRUPTED);
 		KrollDict data = new KrollDict();
-		data.put(TiC.EVENT_PROPERTY_MESSAGE, message);
-		data.put(TiC.EVENT_PROPERTY_TYPE, type);
+		data.put(TiC.ERROR_PROPERTY_MESSAGE, message);
+		data.put(TiC.ERROR_PROPERTY_CODE, type);
 		fireEvent(TiC.EVENT_ERROR, data);
 		fireLoadState(MediaModule.VIDEO_LOAD_STATE_UNKNOWN);
 		fireComplete(MediaModule.VIDEO_FINISH_REASON_PLAYBACK_ERROR);
