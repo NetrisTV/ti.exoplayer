@@ -491,19 +491,22 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 			if (cause instanceof DecoderInitializationException) {
 				// Special case for decoder initialization failures.
 				DecoderInitializationException decoderInitializationException = (DecoderInitializationException) cause;
-				if (decoderInitializationException.decoderName == null) {
-					if (decoderInitializationException.getCause() instanceof DecoderQueryException) {
-						errorString = activity.getString(R.string.error_querying_decoders);
-					} else if (decoderInitializationException.secureDecoderRequired) {
-						errorString = activity.getString(R.string.error_no_secure_decoder,
-														 decoderInitializationException.mimeType);
+				try {
+					if (decoderInitializationException.decoderName == null) {
+						if (decoderInitializationException.getCause() instanceof DecoderQueryException) {
+							errorString = activity.getString(TiRHelper.getResource("string.error_querying_decoders"));
+						} else if (decoderInitializationException.secureDecoderRequired) {
+							errorString = activity.getString(TiRHelper.getResource("string.error_no_secure_decoder"),
+															 decoderInitializationException.mimeType);
+						} else {
+							errorString = activity.getString(TiRHelper.getResource("string.error_no_decoder"),
+															 decoderInitializationException.mimeType);
+						}
 					} else {
-						errorString =
-							activity.getString(R.string.error_no_decoder, decoderInitializationException.mimeType);
+						errorString = activity.getString(TiRHelper.getResource("string.error_instantiating_decoder"),
+														 decoderInitializationException.decoderName);
 					}
-				} else {
-					errorString = activity.getString(R.string.error_instantiating_decoder,
-													 decoderInitializationException.decoderName);
+				} catch (TiRHelper.ResourceNotFoundException e1) {
 				}
 			}
 		}
@@ -678,21 +681,26 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 				String drmLicenseUrl = TiConvert.toString(proxy.getProperty(TiExoplayerModule.DRM_LICENSE_URL));
 				String[] keyRequestPropertiesArray =
 					TiConvert.toStringArray((Object[]) proxy.getProperty(TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES));
-				int errorStringId = R.string.error_drm_unknown;
-				if (Util.SDK_INT < 18) {
-					errorStringId = R.string.error_drm_not_supported;
-				} else {
-					try {
-						drmSessionManager =
-							buildDrmSessionManagerV18(drmSchemeUuid, drmLicenseUrl, keyRequestPropertiesArray);
-					} catch (UnsupportedDrmException e) {
-						errorStringId = e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
-											? R.string.error_drm_unsupported_scheme
-											: R.string.error_drm_unknown;
+				try {
+					int errorStringId = TiRHelper.getResource("string.error_drm_unknown");
+					if (Util.SDK_INT < 18) {
+						errorStringId = TiRHelper.getResource("string.error_drm_not_supported");
+					} else {
+						try {
+							drmSessionManager =
+								buildDrmSessionManagerV18(drmSchemeUuid, drmLicenseUrl, keyRequestPropertiesArray);
+						} catch (UnsupportedDrmException e) {
+							errorStringId = e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
+												? TiRHelper.getResource("string.error_drm_unsupported_scheme")
+												: TiRHelper.getResource("string.error_drm_unknown");
+						}
 					}
-				}
-				if (drmSessionManager == null) {
-					showToast(errorStringId);
+					if (drmSessionManager == null) {
+						showToast(errorStringId);
+						return;
+					}
+				} catch (TiRHelper.ResourceNotFoundException e) {
+					showToast("Error");
 					return;
 				}
 			}
@@ -735,7 +743,11 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 			try {
 				mediaSource = createAdsMediaSource(mediaSource, Uri.parse(adTagUriString));
 			} catch (Exception e) {
-				showToast(R.string.ima_not_loaded);
+				try {
+					showToast(TiRHelper.getResource("string.ima_not_loaded"));
+				} catch (TiRHelper.ResourceNotFoundException ex) {
+					showToast("Playing sample without ads, as the IMA extension was not loaded");
+				}
 			}
 		} else {
 			releaseAdsLoader();
