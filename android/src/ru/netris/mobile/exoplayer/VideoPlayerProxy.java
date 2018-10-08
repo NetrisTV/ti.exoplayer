@@ -220,8 +220,10 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		if (options.containsKey(TiC.PROPERTY_BACKGROUND_COLOR)) {
 			intent.putExtra(TiC.PROPERTY_BACKGROUND_COLOR, TiConvert.toColor(options, TiC.PROPERTY_BACKGROUND_COLOR));
 		}
-		intent.putExtra(TiExoplayerModule.PROPERTY_SURFACE_TYPE,
-						TiConvert.toInt(options, TiExoplayerModule.PROPERTY_SURFACE_TYPE));
+		if (options.containsKey(TiExoplayerModule.PROPERTY_SURFACE_TYPE)) {
+			intent.putExtra(TiExoplayerModule.PROPERTY_SURFACE_TYPE,
+							TiConvert.toInt(options, TiExoplayerModule.PROPERTY_SURFACE_TYPE));
+		}
 		videoActivityHandler = createControlHandler();
 		intent.putExtra(TiC.PROPERTY_MESSENGER, new Messenger(videoActivityHandler));
 		getActivity().startActivity(intent);
