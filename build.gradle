@@ -1,0 +1,47 @@
+import groovy.json.JsonSlurper
+
+ext {
+    tiSDKName = "7.4.1.GA"
+    tiSDKVersion = "7.4.1"
+}
+
+def getSdkPath = { ->
+    def jsonSlurper = new JsonSlurper()
+    def hashStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "ti", "info", "-o", "json", "-t", "titanium", "--sdk", tiSDKName
+        standardOutput = hashStdOut
+    }
+
+    def json = jsonSlurper.parseText(hashStdOut.toString())
+    return json.titanium[ext.tiSDKName].path
+}
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        flatDir {
+            dirs getSdkPath() + '/android', getSdkPath() + '/android/modules'
+        }
+        google()
+        jcenter()
+    }
+}
+
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

@@ -1,8 +1,12 @@
 A native control for playing videos for Titanium. Based on Google ExoPlayer, using Titanium.Media.VideoPlayer API.
 
+Documentation
+---------------
+[Module API documentation](android/documentation/index.md)
+
 Requirements
 ---------------
-- Titanium Mobile SDK 6.3.0.GA or later
+- Titanium Mobile SDK 7.0.0.GA or later
 
 Example
 ---------------
@@ -40,7 +44,20 @@ Or include the module as a dependency to a native module by adding a `<module>` 
 
 Build
 ---------------
-`appc run -p android --build-only` from the `android` directory
+Run  from the project root directory
+>`./gradlew tiBuild`
+
+**Important:** module dependencies are not included in this repository. Command above will download them for you.
+
+If for some reasons you want to build this module using only `appc` or `titanium` cli commands, you should download exoplayer libraries (or build them locally) and put into `app/libs` (or `android/lib` which is symlink). After that you should run:
+
+>`appc run -p android --build-only`
+
+or
+
+>`ti build -p android --build-only`
+
+from the `android` directory
 
 Known issues
 ------------
