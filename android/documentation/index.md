@@ -68,6 +68,22 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `tracksChanged`: new event, property `trackInfo`
 * `volumechange`: new event, property `volume`. Fired when the volume on [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC) changes.
 
+* `bufferUpdate`: 
+* `positionUpdate`: 
+* `ready`: 
+* `stalled`: 
+* `didComplete`: 
+* `willPlay`: 
+* `playing`: 
+* `willPause`: 
+* `didPause`: 
+* `willStop`: 
+* `didStop`: 
+* `error`: 
+* `seek`: 
+* `willSeek`: 
+* `didSeek`: 
+
 ### Properties
 * `contentType`: one of `ExoPlayer.CONTENT_TYPE_*`
 * `drmScheme`: one of `ExoPlayer.DRM_*`
