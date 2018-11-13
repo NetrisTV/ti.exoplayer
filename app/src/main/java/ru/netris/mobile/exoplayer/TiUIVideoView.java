@@ -1,7 +1,7 @@
-/**
+/*
  * Titanium Exoplayer module
  * Copyright (c) 2012 by Appcelerator, Inc. All Rights Reserved.
- * Copyright (c) 2017 by Netris, CJSC. All Rights Reserved.
+ * Copyright (c) 2018 by Netris, CJSC. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
