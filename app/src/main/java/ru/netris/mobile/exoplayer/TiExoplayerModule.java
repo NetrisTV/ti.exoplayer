@@ -9,24 +9,25 @@ package ru.netris.mobile.exoplayer;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 
-import org.appcelerator.titanium.TiApplication;
-import org.appcelerator.kroll.common.Log;
-import org.appcelerator.kroll.common.TiConfig;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.RendererCapabilities;
+import com.google.android.exoplayer2.offline.DownloadAction;
+import com.google.android.exoplayer2.offline.ProgressiveDownloadAction;
+import com.google.android.exoplayer2.source.dash.offline.DashDownloadAction;
+import com.google.android.exoplayer2.source.hls.offline.HlsDownloadAction;
+import com.google.android.exoplayer2.source.smoothstreaming.offline.SsDownloadAction;
 
 @Kroll.module(name = "TiExoplayer", id = "ru.netris.mobile.exoplayer")
 public class TiExoplayerModule extends KrollModule
 {
 
-	private static final String LCAT = "TiExoplayerModule";
-	private static final boolean DBG = TiConfig.LOGD;
+	private static final String TAG = "TiExoplayerModule";
 	public static final String MODULE_NAME = "TiExoplayerModule";
 	public static final String DRM_SCHEME_UUID_EXTRA = "drmScheme";
 	public static final String DRM_LICENSE_URL = "drmLicenseUrl";
 	public static final String DRM_KEY_REQUEST_PROPERTIES = "drmKeyRequestProperties";
+	public static final String DRM_MULTI_SESSION_EXTRA = "drm_multi_session";
 	public static final String PREFER_EXTENSION_DECODERS = "preferExtensionDecoders";
 	public static final String CONTENT_TYPE = "contentType";
 	public static final String AD_TAG_URI_EXTRA = "adTagUri";
@@ -126,8 +127,42 @@ public class TiExoplayerModule extends KrollModule
 	@Kroll.constant
 	public static final int SURFACE_TYPE_TEXTURE_VIEW = 2;
 
+	private String downloadActionFile = "actions";
+	private String downloadTrackerActionFile = "tracked_actions";
+	private String downloadContentDirectory = "downloads";
+	private int maxSimultaneousDownloads = 2;
+	private static final DownloadAction.Deserializer[] DOWNLOAD_DESERIALIZERS =
+		new DownloadAction.Deserializer[] { DashDownloadAction.DESERIALIZER, HlsDownloadAction.DESERIALIZER,
+											SsDownloadAction.DESERIALIZER, ProgressiveDownloadAction.DESERIALIZER };
+
+	private static DownloadTrackerProxy dtProxy = null;
+	private static TiExoplayerModule self;
+
 	public TiExoplayerModule()
 	{
 		super();
+		self = this;
+	}
+
+	public static TiExoplayerModule getInstance()
+	{
+		return self;
+	}
+
+	public void releaseDownloadTrackerProxy()
+	{
+		dtProxy = null;
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.getProperty
+	public DownloadTrackerProxy getDownloadTrackerProxy()
+	// clang-format on
+	{
+		if (dtProxy == null) {
+			dtProxy = new DownloadTrackerProxy();
+		}
+		return dtProxy;
 	}
 }

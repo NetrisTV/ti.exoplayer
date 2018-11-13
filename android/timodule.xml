@@ -12,11 +12,22 @@
 			<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 			<uses-feature android:name="android.software.leanback" android:required="false"/>
 			<uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
-			<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="25"/>
+			<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="28"/>
 			<application>
 				<activity android:name="ru.netris.mobile.exoplayer.TiExoplayerActivity"
 					android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
 					android:launchMode="singleTop" />
+				<service android:name="ru.netris.mobile.exoplayer.DemoDownloadService"
+					android:exported="false">
+					<intent-filter>
+						<action android:name="com.google.android.exoplayer.downloadService.action.RESTART"/>
+						<category android:name="android.intent.category.DEFAULT"/>
+					</intent-filter>
+				</service>
+
+				<service android:name="com.google.android.exoplayer2.scheduler.PlatformScheduler$PlatformSchedulerService"
+					android:permission="android.permission.BIND_JOB_SERVICE"
+					android:exported="true"/>
 			</application>
 		</manifest>
 	</android>

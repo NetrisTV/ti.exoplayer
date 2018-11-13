@@ -7,13 +7,13 @@
  */
 package ru.netris.mobile.exoplayer;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiC;
-import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.util.TiConvert;
 import org.appcelerator.titanium.util.TiRHelper;
@@ -23,31 +23,24 @@ import org.appcelerator.titanium.view.TiUIView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ti.modules.titanium.media.TiPlaybackListener;
 import ti.modules.titanium.media.MediaModule;
 
 import android.app.Activity;
 import android.content.Context;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Messenger;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnTouchListener;
 import android.widget.MediaController;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.C.ContentType;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -60,50 +53,51 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
-import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.drm.UnsupportedDrmException;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.DecoderInitializationException;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil.DecoderQueryException;
 import com.google.android.exoplayer2.metadata.Metadata;
-import com.google.android.exoplayer2.metadata.MetadataRenderer;
+import com.google.android.exoplayer2.metadata.MetadataOutput;
+import com.google.android.exoplayer2.offline.FilteringManifestParser;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.ads.AdsLoader;
 import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.source.dash.manifest.DashManifestParser;
+import com.google.android.exoplayer2.source.dash.manifest.RepresentationKey;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistParser;
+import com.google.android.exoplayer2.source.hls.playlist.RenditionKey;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifestParser;
+import com.google.android.exoplayer2.source.smoothstreaming.manifest.StreamKey;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector.MappedTrackInfo;
-import com.google.android.exoplayer2.trackselection.MappingTrackSelector.SelectionOverride;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector.SelectionOverride;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
-import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
-public class TiUIVideoView extends TiUIView implements EventListener, PlaybackControlView.VisibilityListener,
-													   MetadataRenderer.Output, VideoRendererEventListener
+public class TiUIVideoView extends TiUIView
+	implements EventListener, PlayerControlView.VisibilityListener, MetadataOutput, VideoRendererEventListener
 
 {
 	private static final String TAG = "TiUIVideoView";
@@ -115,7 +109,6 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 	private boolean shouldAutoPlay;
 	private int resumeWindow = C.INDEX_UNSET;
 	private long resumePosition;
-	private EventLogger eventLogger;
 	private PlayerView videoView;
 	private MediaController mediaController;
 
@@ -320,7 +313,7 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 		} else if (mode == MediaModule.VIDEO_SCALING_NONE) {
 			Log.w(TAG, "unsupported scaling mode VIDEO_SCALING_NONE");
 			videoView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
-			player.setVideoScalingMode(C.VIDEO_SCALING_MODE_DEFAULT);
+			player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
 		}
 	}
 
@@ -467,7 +460,6 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 		videoView = null;
 		mediaController = null;
 		trackSelector = null;
-		eventLogger = null;
 	}
 
 	// Player.EventListener implementation
@@ -594,11 +586,11 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 			JSONObject trackInfo = ModuleUtil.buildTrackInfoJSONObject(mappedTrackInfo, trackSelections, player);
 			if (trackGroups != lastSeenTrackGroupArray) {
 				if (mappedTrackInfo != null) {
-					if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_VIDEO)
+					if (mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
 						== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 						trackInfo.put("unsupportedVideo", true);
 					}
-					if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_AUDIO)
+					if (mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_AUDIO)
 						== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 						trackInfo.put("unsupportedAudio", true);
 					}
@@ -667,7 +659,6 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 			fixedTrackSelectionFactory = new FixedTrackSelection.Factory();
 			trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
 			lastSeenTrackGroupArray = null;
-			eventLogger = new EventLogger(trackSelector);
 
 			UUID drmSchemeUuid = null;
 			Object scheme = proxy.getProperty(TiExoplayerModule.DRM_SCHEME_UUID_EXTRA);
@@ -678,19 +669,21 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 					Log.e(TAG, e.getMessage());
 				}
 			}
-			DrmSessionManager<FrameworkMediaCrypto> drmSessionManager = null;
+			DefaultDrmSessionManager<FrameworkMediaCrypto> drmSessionManager = null;
 			if (drmSchemeUuid != null) {
 				String drmLicenseUrl = TiConvert.toString(proxy.getProperty(TiExoplayerModule.DRM_LICENSE_URL));
 				String[] keyRequestPropertiesArray =
 					TiConvert.toStringArray((Object[]) proxy.getProperty(TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES));
+				boolean multiSession =
+					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.DRM_MULTI_SESSION_EXTRA), false);
 				try {
 					int errorStringId = TiRHelper.getResource("string.error_drm_unknown");
 					if (Util.SDK_INT < 18) {
 						errorStringId = TiRHelper.getResource("string.error_drm_not_supported");
 					} else {
 						try {
-							drmSessionManager =
-								buildDrmSessionManagerV18(drmSchemeUuid, drmLicenseUrl, keyRequestPropertiesArray);
+							drmSessionManager = buildDrmSessionManagerV18(drmSchemeUuid, drmLicenseUrl,
+																		  keyRequestPropertiesArray, multiSession);
 						} catch (UnsupportedDrmException e) {
 							errorStringId = e.reason == UnsupportedDrmException.REASON_UNSUPPORTED_SCHEME
 												? TiRHelper.getResource("string.error_drm_unsupported_scheme")
@@ -719,13 +712,9 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 			DefaultRenderersFactory renderersFactory =
 				new DefaultRenderersFactory(activity, drmSessionManager, extensionRendererMode);
 
-			player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector);
+			player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, drmSessionManager);
 			player.addListener(this);
-			player.addListener(eventLogger);
 			player.addMetadataOutput(this);
-			player.addMetadataOutput(eventLogger);
-			player.setAudioDebugListener(eventLogger);
-			player.setVideoDebugListener(eventLogger);
 			player.setVideoDebugListener(this);
 
 			processProperties(getPlayerProxy().getProperties());
@@ -734,7 +723,7 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 		player.setPlayWhenReady(shouldAutoPlay);
 		Uri uri = Uri.parse(uriString);
 		Object contentType = proxy.getProperty(TiExoplayerModule.CONTENT_TYPE);
-		MediaSource mediaSource = buildMediaSource(uri, contentType, mainHandler, eventLogger);
+		MediaSource mediaSource = buildMediaSource(uri, TiConvert.toString(contentType, null));
 		String adTagUriString = TiConvert.toString(proxy.getProperty(TiExoplayerModule.AD_TAG_URI_EXTRA));
 		if (adTagUriString != null) {
 			Uri adTagUri = Uri.parse(adTagUriString);
@@ -786,29 +775,29 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 	{
 		MappedTrackInfo trackInfo = trackSelector.getCurrentMappedTrackInfo();
 		TrackGroupArray trackGroups = trackInfo.getTrackGroups(rendererIndex);
-		SelectionOverride override = trackSelector.getSelectionOverride(rendererIndex, trackGroups);
-		TrackSelection.Factory factory =
-			tracks.length == 1 ? fixedTrackSelectionFactory : adaptiveTrackSelectionFactory;
-		override = new SelectionOverride(factory, groupIndex, tracks);
-		trackSelector.setRendererDisabled(rendererIndex, false);
-		trackSelector.setSelectionOverride(rendererIndex, trackGroups, override);
+		SelectionOverride override = new SelectionOverride(groupIndex, tracks);
+		DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+		parametersBuilder.setRendererDisabled(rendererIndex, false);
+		parametersBuilder.setSelectionOverride(rendererIndex, trackGroups, override);
+		trackSelector.setParameters(parametersBuilder);
 	}
 
 	public void clearTrackSelectionOverrides(int rendererIndex)
 	{
 		MappedTrackInfo trackInfo = trackSelector.getCurrentMappedTrackInfo();
 		TrackGroupArray trackGroups = trackInfo.getTrackGroups(rendererIndex);
-		SelectionOverride override = trackSelector.getSelectionOverride(rendererIndex, trackGroups);
-		override = trackSelector.getSelectionOverride(rendererIndex, trackGroups);
-		trackSelector.setRendererDisabled(rendererIndex, false);
+		DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
+		SelectionOverride override = trackSelector.getParameters().getSelectionOverride(rendererIndex, trackGroups);
+		trackSelector.setParameters(parametersBuilder.setRendererDisabled(rendererIndex, false));
 		if (override != null) {
-			trackSelector.clearSelectionOverrides(rendererIndex);
+			parametersBuilder.clearSelectionOverrides(rendererIndex);
 		}
+		trackSelector.setParameters(parametersBuilder);
 	}
 
 	public void setRendererDisabled(int rendererIndex, boolean disabled)
 	{
-		trackSelector.setRendererDisabled(rendererIndex, disabled);
+		trackSelector.setParameters(trackSelector.buildUponParameters().setRendererDisabled(rendererIndex, disabled));
 	}
 
 	public Format getVideoFormat()
@@ -861,37 +850,58 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 		}
 	}
 
-	private DrmSessionManager<FrameworkMediaCrypto> buildDrmSessionManagerV18(UUID uuid, String licenseUrl,
-																			  String[] keyRequestPropertiesArray)
+	private List<?> getOfflineStreamKeys(Uri uri)
+	{
+		return TiExoplayerModule.getInstance().getDownloadTrackerProxy().getDownloadTracker().getOfflineStreamKeys(uri);
+	}
+
+	private DefaultDrmSessionManager<FrameworkMediaCrypto>
+	buildDrmSessionManagerV18(UUID uuid, String licenseUrl, String[] keyRequestPropertiesArray, boolean multiSession)
 		throws UnsupportedDrmException
 	{
-		HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl, buildHttpDataSourceFactory(false));
+		HttpDataSource.Factory licenseDataSourceFactory =
+			new DefaultHttpDataSourceFactory(Util.getUserAgent(activity, TiExoplayerModule.MODULE_NAME),
+											 /* listener= */ null);
+		HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl, licenseDataSourceFactory);
 		if (keyRequestPropertiesArray != null) {
 			for (int i = 0; i < keyRequestPropertiesArray.length - 1; i += 2) {
 				drmCallback.setKeyRequestProperty(keyRequestPropertiesArray[i], keyRequestPropertiesArray[i + 1]);
 			}
 		}
-		return new DefaultDrmSessionManager<>(uuid, FrameworkMediaDrm.newInstance(uuid), drmCallback, null, mainHandler,
-											  eventLogger);
+		return new DefaultDrmSessionManager<>(uuid, FrameworkMediaDrm.newInstance(uuid), drmCallback, null,
+											  multiSession);
 	}
 
-	private MediaSource buildMediaSource(Uri uri, Object overrideContentType, @Nullable Handler handler,
-										 @Nullable MediaSourceEventListener listener)
+	private MediaSource buildMediaSource(Uri uri)
 	{
-		int type = overrideContentType == null ? Util.inferContentType(uri) : TiConvert.toInt(overrideContentType);
+		return buildMediaSource(uri, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	private MediaSource buildMediaSource(Uri uri, @Nullable String overrideExtension)
+	{
+		@ContentType
+		int type = Util.inferContentType(uri, overrideExtension);
 		switch (type) {
-			case C.TYPE_SS:
-				return new SsMediaSource(uri, buildDataSourceFactory(false),
-										 new DefaultSsChunkSource.Factory(mediaDataSourceFactory), handler, listener);
 			case C.TYPE_DASH:
-				return new DashMediaSource(uri, buildDataSourceFactory(false),
-										   new DefaultDashChunkSource.Factory(mediaDataSourceFactory), handler,
-										   listener);
+				return new DashMediaSource
+					.Factory(new DefaultDashChunkSource.Factory(mediaDataSourceFactory), buildDataSourceFactory(false))
+					.setManifestParser(new FilteringManifestParser<>(
+						new DashManifestParser(), (List<RepresentationKey>) getOfflineStreamKeys(uri)))
+					.createMediaSource(uri);
+			case C.TYPE_SS:
+				return new SsMediaSource
+					.Factory(new DefaultSsChunkSource.Factory(mediaDataSourceFactory), buildDataSourceFactory(false))
+					.setManifestParser(new FilteringManifestParser<>(new SsManifestParser(),
+																	 (List<StreamKey>) getOfflineStreamKeys(uri)))
+					.createMediaSource(uri);
 			case C.TYPE_HLS:
-				return new HlsMediaSource(uri, mediaDataSourceFactory, handler, listener);
+				return new HlsMediaSource.Factory(mediaDataSourceFactory)
+					.setPlaylistParser(new FilteringManifestParser<>(new HlsPlaylistParser(),
+																	 (List<RenditionKey>) getOfflineStreamKeys(uri)))
+					.createMediaSource(uri);
 			case C.TYPE_OTHER:
-				return new ExtractorMediaSource.Factory(mediaDataSourceFactory)
-					.createMediaSource(uri, handler, listener);
+				return new ExtractorMediaSource.Factory(mediaDataSourceFactory).createMediaSource(uri);
 			default: {
 				throw new IllegalStateException("Unsupported type: " + type);
 			}
@@ -928,10 +938,9 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 		}
 		AdsMediaSource.MediaSourceFactory adMediaSourceFactory = new AdsMediaSource.MediaSourceFactory() {
 			@Override
-			public MediaSource createMediaSource(Uri uri, @Nullable Handler handler,
-												 @Nullable MediaSourceEventListener listener)
+			public MediaSource createMediaSource(Uri uri)
 			{
-				return TiUIVideoView.this.buildMediaSource(uri, /* overrideExtension= */ null, handler, listener);
+				return TiUIVideoView.this.buildMediaSource(uri);
 			}
 
 			@Override
@@ -940,39 +949,20 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 				return new int[] { C.TYPE_DASH, C.TYPE_SS, C.TYPE_HLS, C.TYPE_OTHER };
 			}
 		};
-		return new AdsMediaSource(mediaSource, adMediaSourceFactory, adsLoader, adUiViewGroup, mainHandler,
-								  eventLogger);
-	}
-
-	/**
-	 * Returns a new HttpDataSource factory.
-	 *
-	 * @param useBandwidthMeter Whether to set {@link #BANDWIDTH_METER} as a listener to the new
-	 *                          DataSource factory.
-	 * @return A new HttpDataSource factory.
-	 */
-	private HttpDataSource.Factory buildHttpDataSourceFactory(boolean useBandwidthMeter)
-	{
-		return buildHttpDataSourceFactory(useBandwidthMeter ? BANDWIDTH_METER : null);
-	}
-
-	private HttpDataSource.Factory buildHttpDataSourceFactory(DefaultBandwidthMeter bandwidthMeter)
-	{
-		return new DefaultHttpDataSourceFactory(Util.getUserAgent(activity, TiExoplayerModule.MODULE_NAME),
-												bandwidthMeter);
+		return new AdsMediaSource(mediaSource, adMediaSourceFactory, adsLoader, adUiViewGroup);
 	}
 
 	/**
 	 * Returns a new DataSource factory.
 	 *
 	 * @param useBandwidthMeter Whether to set {@link #BANDWIDTH_METER} as a listener to the new
-	 *                          DataSource factory.
+	 *     DataSource factory.
 	 * @return A new DataSource factory.
 	 */
 	private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter)
 	{
-		return new DefaultDataSourceFactory(TiApplication.getInstance(), useBandwidthMeter ? BANDWIDTH_METER : null,
-											buildHttpDataSourceFactory(useBandwidthMeter));
+		return TiExoplayerModule.getInstance().getDownloadTrackerProxy().buildDataSourceFactory(
+			useBandwidthMeter ? BANDWIDTH_METER : null);
 	}
 
 	private static String getDiscontinuityReasonString(@Player.DiscontinuityReason int reason)

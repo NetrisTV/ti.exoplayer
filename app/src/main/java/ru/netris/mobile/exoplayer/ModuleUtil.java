@@ -43,16 +43,16 @@ final class ModuleUtil
 		JSONArray renderers = new JSONArray();
 		trackInfo.put("renderers", renderers);
 		if (mappedTrackInfo != null) {
-			if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_VIDEO)
+			if (mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
 				== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 				trackInfo.put("unsupportedVideo", true);
 			}
-			if (mappedTrackInfo.getTrackTypeRendererSupport(C.TRACK_TYPE_AUDIO)
+			if (mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_AUDIO)
 				== MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
 				trackInfo.put("unsupportedAudio", true);
 			}
 
-			for (int rendererIndex = 0; rendererIndex < mappedTrackInfo.length; rendererIndex++) {
+			for (int rendererIndex = 0; rendererIndex < mappedTrackInfo.getRendererCount(); rendererIndex++) {
 				TrackGroupArray rendererTrackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
 				TrackSelection trackSelection = trackSelections.get(rendererIndex);
 				if (rendererTrackGroups.length > 0) {
@@ -77,7 +77,7 @@ final class ModuleUtil
 							track.put("index", trackIndex);
 							track.put("format", buildFormatJSONObject(trackGroup.getFormat(trackIndex)));
 							track.put("supported",
-									  mappedTrackInfo.getTrackFormatSupport(rendererIndex, groupIndex, trackIndex));
+									  mappedTrackInfo.getTrackSupport(rendererIndex, groupIndex, trackIndex));
 							tracks.put(track);
 						}
 						group.put("tracks", tracks);
@@ -96,7 +96,7 @@ final class ModuleUtil
 					renderers.put(renderer);
 				}
 			}
-			TrackGroupArray unassociatedTrackGroups = mappedTrackInfo.getUnassociatedTrackGroups();
+			TrackGroupArray unassociatedTrackGroups = mappedTrackInfo.getUnmappedTrackGroups();
 			if (unassociatedTrackGroups.length > 0) {
 				JSONObject renderer = new JSONObject();
 				JSONArray groups = new JSONArray();
@@ -125,7 +125,7 @@ final class ModuleUtil
 		return trackInfo;
 	}
 
-	public static JSONObject buildFormatJSONObject(Format format) throws JSONException
+	private static JSONObject buildFormatJSONObject(Format format) throws JSONException
 	{
 		JSONObject jsonFormat = new JSONObject();
 		jsonFormat.put("mimeType", format.sampleMimeType);

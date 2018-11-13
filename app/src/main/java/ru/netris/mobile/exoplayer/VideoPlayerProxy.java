@@ -53,6 +53,7 @@ import com.google.android.exoplayer2.util.Util;
 		TiExoplayerModule.DRM_SCHEME_UUID_EXTRA,
 		TiExoplayerModule.DRM_LICENSE_URL,
 		TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES,
+		TiExoplayerModule.DRM_MULTI_SESSION_EXTRA,
 		TiExoplayerModule.PREFER_EXTENSION_DECODERS,
 		TiExoplayerModule.PROPERTY_LINEAR_GAIN, TiC.PROPERTY_REPEAT_MODE
 })
@@ -258,7 +259,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 						Log.d(TAG, "TiExoplayerActivity sending activity started message to proxy", Log.DEBUG_MODE);
 						// The TiVideoActivity has started and has called its own
 						// setContentView, which is a TiCompositeLayout with the
-						// SimpleExoPlayerView view on it.  In chain of calls below,
+						// PlayerView view on it.  In chain of calls below,
 						// we create a TiUIVideoView and set its nativeView to the
 						// already-existing layout from the activity.
 						TiExoplayerActivity videoActivity = (TiExoplayerActivity) msg.obj;
