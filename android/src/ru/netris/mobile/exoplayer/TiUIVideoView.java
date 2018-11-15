@@ -259,7 +259,9 @@ public class TiUIVideoView extends TiUIView implements EventListener, PlaybackCo
 		} else if (key.equals(TiC.PROPERTY_SCALING_MODE)) {
 			setScalingMode(TiConvert.toInt(newValue));
 		} else if (key.equals(TiExoplayerModule.PROPERTY_LINEAR_GAIN)) {
-			player.setVolume(TiConvert.toFloat(newValue));
+			if (player != null) {
+				player.setVolume(TiConvert.toFloat(newValue));
+			}
 		} else if (key.equals(TiC.PROPERTY_REPEAT_MODE)) {
 			setRepeatMode(TiConvert.toInt(newValue));
 		} else if (key.equals(TiC.PROPERTY_SHOWS_CONTROLS)) {
