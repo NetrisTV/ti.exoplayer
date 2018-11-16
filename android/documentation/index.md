@@ -18,6 +18,7 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `ExoPlayer.createVideoPlayer`: [`Titanium.Media.createVideoPlayer`](http://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media-method-createVideoPlayer)
 
 ## Properties
+* `ExoPlayer.DEFAULT_PLAYBACK_PARAMETERS`: [PlaybackParameters.DEFAULT](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/PlaybackParameters.html#DEFAULT), see `VideoPlayer.playbackParameters` properry
 * `ExoPlayer.DRM_WIDEVINE`
 * `ExoPlayer.DRM_PLAYREADY`
 * `ExoPlayer.DRM_CLEARKEY`
@@ -47,7 +48,10 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `ExoPlayer.SURFACE_TYPE_SURFACE_VIEW`
 * `ExoPlayer.SURFACE_TYPE_TEXTURE_VIEW`
 
-## VideoPlayer API Difference
+## VideoPlayer
+For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media.VideoPlayer).
+
+ Documentation below describes only additional or removed methods, properties and events.
 ### Methods
 * `cancelAllThumbnailImageRequests`: not supported
 * `requestThumbnailImagesAtTimes`: not supported
@@ -83,6 +87,10 @@ The `ExoPlayer` variable is a reference to the Module object.
  (see [Format](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/Format.html)).
  Returns `0` for all properties if not known or applicable.
  The `naturalsizeavailable` event is fired when the natural size is known.
+* `playbackParameters`: [PlaybackParameters](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/PlaybackParameters.html), Object with properties:
+  * `pitch`: type `number`, The factor by which the audio pitch will be scaled.
+  * `skipSilence`: type `boolean`, Whether to skip silence in the input.
+  * `speed`: type `number`, The factor by which playback will be sped up.
 * `showsControls`: [`videoPlayer.showsControls`](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media.VideoPlayer-property-showsControls)
 * `surfaceType`: The type of surface view used for video playbacks. Valid values are `ExoPlayer.SURFACE_TYPE_*`.
 * `volume`: Ajusts volume of [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC)

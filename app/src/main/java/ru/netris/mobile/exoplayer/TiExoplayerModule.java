@@ -6,11 +6,13 @@
  */
 package ru.netris.mobile.exoplayer;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.RendererCapabilities;
 import com.google.android.exoplayer2.offline.DownloadAction;
 import com.google.android.exoplayer2.offline.ProgressiveDownloadAction;
@@ -24,6 +26,10 @@ public class TiExoplayerModule extends KrollModule
 	private static final String TAG = "TiExoplayerModule";
 	public static final String MODULE_NAME = "TiExoplayerModule";
 
+	public static final String PARAMETERS_PROPERTY_PITCH = "pitch";
+	public static final String PARAMETERS_PROPERTY_SKIP_SILENCE = "skipSilence";
+	public static final String PARAMETERS_PROPERTY_SPEED = "speed";
+
 	public static final String PROPERTY_AD_TAG_URI_EXTRA = "adTagUri";
 	public static final String PROPERTY_CONTENT_TYPE = "contentType";
 	public static final String PROPERTY_DRM_KEY_REQUEST_PROPERTIES = "drmKeyRequestProperties";
@@ -32,6 +38,7 @@ public class TiExoplayerModule extends KrollModule
 	public static final String PROPERTY_DRM_SCHEME_UUID_EXTRA = "drmScheme";
 	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
 	public static final String PROPERTY_NATURAL_SIZE = "naturalSize";
+	public static final String PROPERTY_PLAYBACK_PARAMETERS = "playbackParameters";
 	public static final String PROPERTY_PREFER_EXTENSION_DECODERS = "preferExtensionDecoders";
 	public static final String PROPERTY_SURFACE_TYPE = "surfaceType";
 
@@ -164,5 +171,11 @@ public class TiExoplayerModule extends KrollModule
 			dtProxy = new DownloadTrackerProxy();
 		}
 		return dtProxy;
+	}
+
+	@Kroll.getProperty(name = "DEFAULT_PLAYBACK_PARAMETERS")
+	public KrollDict getDefaultPlaybackParameters()
+	{
+		return VideoPlayerProxy.getPlaybackParametersDict(PlaybackParameters.DEFAULT);
 	}
 }

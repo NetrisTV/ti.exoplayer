@@ -231,6 +231,11 @@ public class TiUIVideoView extends TiUIView
 			shouldAutoPlay = TiConvert.toBoolean(d, TiC.PROPERTY_AUTOPLAY);
 			player.setPlayWhenReady(shouldAutoPlay);
 		}
+
+		PlaybackParameters playbackParameters = ((VideoPlayerProxy) proxy).playbackParameters;
+		if (!PlaybackParameters.DEFAULT.equals(playbackParameters)) {
+			player.setPlaybackParameters(playbackParameters);
+		}
 	}
 
 	@Override

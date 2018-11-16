@@ -41,6 +41,7 @@ import android.os.Message;
 import android.os.Messenger;
 
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.util.Util;
 
@@ -103,6 +104,8 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	private TiThumbnailRetriever mTiThumbnailRetriever;
 	private SettingsContentObserver mSettingsContentObserver;
 
+	public PlaybackParameters playbackParameters = PlaybackParameters.DEFAULT;
+
 	public VideoPlayerProxy()
 	{
 		super();
@@ -111,6 +114,15 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		defaultValues.put(TiC.PROPERTY_SHOWS_CONTROLS, true);
 		defaultValues.put(TiExoplayerModule.PROPERTY_LINEAR_GAIN, 1.0f);
 		defaultValues.put(TiExoplayerModule.PROPERTY_SURFACE_TYPE, TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW);
+	}
+
+	public static KrollDict getPlaybackParametersDict(PlaybackParameters playbackParameters)
+	{
+		KrollDict d = new KrollDict();
+		d.put(TiExoplayerModule.PARAMETERS_PROPERTY_SKIP_SILENCE, playbackParameters.skipSilence);
+		d.put(TiExoplayerModule.PARAMETERS_PROPERTY_PITCH, playbackParameters.pitch);
+		d.put(TiExoplayerModule.PARAMETERS_PROPERTY_SPEED, playbackParameters.speed);
+		return d;
 	}
 
 	public class SettingsContentObserver extends ContentObserver
@@ -938,6 +950,50 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 			}
 		}
 		return d;
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.setProperty
+	public void setPlaybackParameters(KrollDict options)
+	// clang-format on
+	{
+		boolean skipSilence;
+		float pitch;
+		float speed;
+
+		if (options.containsKeyAndNotNull(TiExoplayerModule.PARAMETERS_PROPERTY_SKIP_SILENCE)) {
+			skipSilence = options.getBoolean(TiExoplayerModule.PARAMETERS_PROPERTY_SKIP_SILENCE);
+		} else {
+			skipSilence = playbackParameters.skipSilence;
+		}
+		if (options.containsKeyAndNotNull(TiExoplayerModule.PARAMETERS_PROPERTY_PITCH)) {
+			pitch = options.getDouble(TiExoplayerModule.PARAMETERS_PROPERTY_PITCH).floatValue();
+		} else {
+			pitch = playbackParameters.pitch;
+		}
+		if (options.containsKeyAndNotNull(TiExoplayerModule.PARAMETERS_PROPERTY_SPEED)) {
+			speed = options.getDouble(TiExoplayerModule.PARAMETERS_PROPERTY_SPEED).floatValue();
+		} else {
+			speed = playbackParameters.speed;
+		}
+
+		playbackParameters = new PlaybackParameters(speed, pitch, skipSilence);
+		if (view != null) {
+			SimpleExoPlayer player = getVideoView().getPlayer();
+			if (player != null) {
+				player.setPlaybackParameters(playbackParameters);
+			}
+		}
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.getProperty
+	public KrollDict getPlaybackParameters()
+	// clang-format on
+	{
+		return getPlaybackParametersDict(playbackParameters);
 	}
 
 	public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio)
