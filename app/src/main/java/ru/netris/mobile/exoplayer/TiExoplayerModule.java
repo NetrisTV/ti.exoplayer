@@ -21,27 +21,27 @@ import com.google.android.exoplayer2.source.smoothstreaming.offline.SsDownloadAc
 @Kroll.module(name = "TiExoplayer", id = "ru.netris.mobile.exoplayer")
 public class TiExoplayerModule extends KrollModule
 {
-
 	private static final String TAG = "TiExoplayerModule";
 	public static final String MODULE_NAME = "TiExoplayerModule";
-	public static final String DRM_SCHEME_UUID_EXTRA = "drmScheme";
-	public static final String DRM_LICENSE_URL = "drmLicenseUrl";
-	public static final String DRM_KEY_REQUEST_PROPERTIES = "drmKeyRequestProperties";
-	public static final String DRM_MULTI_SESSION_EXTRA = "drm_multi_session";
-	public static final String PREFER_EXTENSION_DECODERS = "preferExtensionDecoders";
-	public static final String CONTENT_TYPE = "contentType";
-	public static final String AD_TAG_URI_EXTRA = "adTagUri";
 
-	public static final String EVENT_TRACKS_CHANGED = "tracksChanged";
+	public static final String PROPERTY_AD_TAG_URI_EXTRA = "adTagUri";
+	public static final String PROPERTY_CONTENT_TYPE = "contentType";
+	public static final String PROPERTY_DRM_KEY_REQUEST_PROPERTIES = "drmKeyRequestProperties";
+	public static final String PROPERTY_DRM_LICENSE_URL = "drmLicenseUrl";
+	public static final String PROPERTY_DRM_MULTI_SESSION_EXTRA = "drm_multi_session";
+	public static final String PROPERTY_DRM_SCHEME_UUID_EXTRA = "drmScheme";
+	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
+	public static final String PROPERTY_NATURAL_SIZE = "naturalSize";
+	public static final String PROPERTY_PREFER_EXTENSION_DECODERS = "preferExtensionDecoders";
+	public static final String PROPERTY_SURFACE_TYPE = "surfaceType";
+
 	public static final String EVENT_METADATA = "metadata";
-	public static final String EVENT_VOLUME_CHANGE = "volumechange";
 	public static final String EVENT_NATURAL_SIZE_AVAILABLE = "naturalsizeavailable";
 
 	public static final String EVENT_PROPERTY_PIXEL_RATIO = "pixelRatio";
 
-	public static final String PROPERTY_NATURAL_SIZE = "naturalSize";
-	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
-	public static final String PROPERTY_SURFACE_TYPE = "surfaceType";
+	public static final String EVENT_TRACKS_CHANGED = "tracksChanged";
+	public static final String EVENT_VOLUME_CHANGE = "volumechange";
 
 	@Kroll.constant
 	public static final int EXCEPTION_TYPE_SOURCE = ExoPlaybackException.TYPE_SOURCE;

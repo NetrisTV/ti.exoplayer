@@ -661,7 +661,7 @@ public class TiUIVideoView extends TiUIView
 			lastSeenTrackGroupArray = null;
 
 			UUID drmSchemeUuid = null;
-			Object scheme = proxy.getProperty(TiExoplayerModule.DRM_SCHEME_UUID_EXTRA);
+			Object scheme = proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_SCHEME_UUID_EXTRA);
 			if (scheme != null) {
 				try {
 					drmSchemeUuid = getDrmUuid(TiConvert.toString(scheme));
@@ -671,11 +671,12 @@ public class TiUIVideoView extends TiUIView
 			}
 			DefaultDrmSessionManager<FrameworkMediaCrypto> drmSessionManager = null;
 			if (drmSchemeUuid != null) {
-				String drmLicenseUrl = TiConvert.toString(proxy.getProperty(TiExoplayerModule.DRM_LICENSE_URL));
-				String[] keyRequestPropertiesArray =
-					TiConvert.toStringArray((Object[]) proxy.getProperty(TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES));
+				String drmLicenseUrl =
+					TiConvert.toString(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_LICENSE_URL));
+				String[] keyRequestPropertiesArray = TiConvert.toStringArray(
+					(Object[]) proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_KEY_REQUEST_PROPERTIES));
 				boolean multiSession =
-					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.DRM_MULTI_SESSION_EXTRA), false);
+					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_MULTI_SESSION_EXTRA), false);
 				try {
 					int errorStringId = TiRHelper.getResource("string.error_drm_unknown");
 					if (Util.SDK_INT < 18) {
@@ -701,9 +702,9 @@ public class TiUIVideoView extends TiUIView
 			}
 
 			boolean preferExtensionDecoders = false;
-			if (proxy.hasProperty(TiExoplayerModule.PREFER_EXTENSION_DECODERS)) {
+			if (proxy.hasProperty(TiExoplayerModule.PROPERTY_PREFER_EXTENSION_DECODERS)) {
 				preferExtensionDecoders =
-					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PREFER_EXTENSION_DECODERS), false);
+					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PROPERTY_PREFER_EXTENSION_DECODERS), false);
 			}
 			// All extension renderer modules in lib, so default MODE_ON
 			@DefaultRenderersFactory.ExtensionRendererMode
@@ -722,9 +723,9 @@ public class TiUIVideoView extends TiUIView
 		}
 		player.setPlayWhenReady(shouldAutoPlay);
 		Uri uri = Uri.parse(uriString);
-		Object contentType = proxy.getProperty(TiExoplayerModule.CONTENT_TYPE);
+		Object contentType = proxy.getProperty(TiExoplayerModule.PROPERTY_CONTENT_TYPE);
 		MediaSource mediaSource = buildMediaSource(uri, TiConvert.toString(contentType, null));
-		String adTagUriString = TiConvert.toString(proxy.getProperty(TiExoplayerModule.AD_TAG_URI_EXTRA));
+		String adTagUriString = TiConvert.toString(proxy.getProperty(TiExoplayerModule.PROPERTY_AD_TAG_URI_EXTRA));
 		if (adTagUriString != null) {
 			Uri adTagUri = Uri.parse(adTagUriString);
 			if (!adTagUri.equals(loadedAdTagUri)) {

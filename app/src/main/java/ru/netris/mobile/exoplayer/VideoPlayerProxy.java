@@ -46,16 +46,21 @@ import com.google.android.exoplayer2.util.Util;
 
 // clang-format off
 @Kroll.proxy(creatableInModule = TiExoplayerModule.class, propertyAccessors = {
-		TiC.PROPERTY_URL, TiC.PROPERTY_INITIAL_PLAYBACK_TIME, TiC.PROPERTY_DURATION,
-		TiC.PROPERTY_AUTOPLAY, TiC.PROPERTY_END_PLAYBACK_TIME, TiC.PROPERTY_PLAYABLE_DURATION,
-		TiExoplayerModule.PROPERTY_SURFACE_TYPE,
-		TiExoplayerModule.CONTENT_TYPE,
-		TiExoplayerModule.DRM_SCHEME_UUID_EXTRA,
-		TiExoplayerModule.DRM_LICENSE_URL,
-		TiExoplayerModule.DRM_KEY_REQUEST_PROPERTIES,
-		TiExoplayerModule.DRM_MULTI_SESSION_EXTRA,
-		TiExoplayerModule.PREFER_EXTENSION_DECODERS,
-		TiExoplayerModule.PROPERTY_LINEAR_GAIN, TiC.PROPERTY_REPEAT_MODE
+		TiC.PROPERTY_AUTOPLAY,
+		TiC.PROPERTY_DURATION,
+		TiC.PROPERTY_END_PLAYBACK_TIME,
+		TiC.PROPERTY_INITIAL_PLAYBACK_TIME,
+		TiC.PROPERTY_PLAYABLE_DURATION,
+		TiC.PROPERTY_REPEAT_MODE,
+		TiC.PROPERTY_URL,
+		TiExoplayerModule.PROPERTY_CONTENT_TYPE,
+		TiExoplayerModule.PROPERTY_DRM_KEY_REQUEST_PROPERTIES,
+		TiExoplayerModule.PROPERTY_DRM_LICENSE_URL,
+		TiExoplayerModule.PROPERTY_DRM_MULTI_SESSION_EXTRA,
+		TiExoplayerModule.PROPERTY_DRM_SCHEME_UUID_EXTRA,
+		TiExoplayerModule.PROPERTY_PREFER_EXTENSION_DECODERS,
+		TiExoplayerModule.PROPERTY_LINEAR_GAIN,
+		TiExoplayerModule.PROPERTY_SURFACE_TYPE
 })
 // clang-format on
 public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifecycleEvent
@@ -101,11 +106,11 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	public VideoPlayerProxy()
 	{
 		super();
-		defaultValues.put(TiExoplayerModule.PROPERTY_SURFACE_TYPE, TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW);
-		defaultValues.put(TiExoplayerModule.PROPERTY_LINEAR_GAIN, 1.0f);
-		defaultValues.put(TiC.PROPERTY_SHOWS_CONTROLS, true);
 		defaultValues.put(TiC.PROPERTY_AUTOPLAY, true);
 		defaultValues.put(TiC.PROPERTY_MEDIA_CONTROL_STYLE, MediaModule.VIDEO_CONTROL_DEFAULT);
+		defaultValues.put(TiC.PROPERTY_SHOWS_CONTROLS, true);
+		defaultValues.put(TiExoplayerModule.PROPERTY_LINEAR_GAIN, 1.0f);
+		defaultValues.put(TiExoplayerModule.PROPERTY_SURFACE_TYPE, TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW);
 	}
 
 	public class SettingsContentObserver extends ContentObserver
@@ -924,7 +929,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 		d.put(TiC.PROPERTY_ROTATION, 0);
 		d.put(TiExoplayerModule.EVENT_PROPERTY_PIXEL_RATIO, 0);
 		if (view != null) {
-			Format format = ((TiUIVideoView) view).getVideoFormat();
+			Format format = getVideoView().getVideoFormat();
 			if (format != null) {
 				d.put(TiC.PROPERTY_WIDTH, format.width);
 				d.put(TiC.PROPERTY_HEIGHT, format.height);
