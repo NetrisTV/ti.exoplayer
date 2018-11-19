@@ -9,8 +9,8 @@
 //    </ti:app>
 
 var ExoPlayer = require('ru.netris.mobile.exoplayer');
-var exolist = 'https://raw.githubusercontent.com/google/ExoPlayer/r2.5.4/' +
-  'demo/src/main/assets/media.exolist.json';
+var exolist = 'https://raw.githubusercontent.com/google/ExoPlayer/r2.8.4/' +
+    'demos/main/src/main/assets/media.exolist.json';
 
 var OPTIONS = {
   'Use Ti.Media.VideoPlayer': true,
@@ -66,10 +66,14 @@ function play(options) {
     'error',
     'load',
     'loadstate',
+    'metadata',
     'playbackstate',
     'playing',
     'postlayout',
-    'preload'
+    'preload',
+    'naturalsizeavailable',
+    'trackschange',
+    'volumechange'
   ];
 
   PlayerEvents.forEach(function(event) {
@@ -84,6 +88,65 @@ function play(options) {
   });
 
   if (vidWin) {
+    var controls = Ti.UI.createView({
+      layout: 'vertical',
+      width: Ti.UI.FILL,
+      height: Ti.UI.SIZE,
+      bottom: 0,
+    });
+    var buttons = Ti.UI.createView({
+      layout: 'horizontal',
+      width: Ti.UI.FILL,
+      height: Ti.UI.SIZE
+    });
+    var btn1 = Ti.UI.createButton({
+      title: '+',
+      backgroundColor: '#ffbbbb',
+      color: '#000',
+      width: '33%'
+    });
+    var btn2 = Ti.UI.createButton({
+      title: 'reset',
+      backgroundColor: '#bbbbbb',
+      color: '#000',
+      width: '34%'
+    });
+    var btn3 = Ti.UI.createButton({
+      title: '-',
+      backgroundColor: '#bbffbb',
+      color: '#000',
+      width: '33%'
+    });
+    var label = Ti.UI.createLabel({
+      text: JSON.stringify(player.playbackParameters),
+      color: '#000',
+      height: Ti.UI.SIZE,
+      width: Ti.UI.FILL
+    });
+    btn1.addEventListener('click', function() {
+      var playbackParameters = player.playbackParameters;
+      player.playbackParameters = {
+        speed: playbackParameters.speed + 0.2
+      };
+      label.text = JSON.stringify(player.playbackParameters);
+    });
+    btn2.addEventListener('click', function() {
+      player.playbackParameters = ExoPlayer.DEFAULT_PLAYBACK_PARAMETERS;
+      label.text = JSON.stringify(player.playbackParameters);
+    });
+    btn3.addEventListener('click', function() {
+      var playbackParameters = player.playbackParameters;
+      player.playbackParameters = {
+        speed: playbackParameters.speed - 0.2
+      };
+      label.text = JSON.stringify(player.playbackParameters);
+    });
+    buttons.add(btn1);
+    buttons.add(btn2);
+    buttons.add(btn3);
+    controls.add(label);
+    controls.add(buttons);
+    vidWin.add(controls);
     vidWin.add(player);
     vidWin.open();
   }
@@ -92,35 +155,20 @@ function play(options) {
 
 function convertProperty(key, value) {
   switch (key) {
-  case 'uri':
-    return {key: 'url', value: value};
-  case 'drm_scheme':
-    return {key: 'drmScheme', value: value};
-  case 'drm_license_url':
-    return {key: 'drmLicenseUrl', value: value};
-  case 'drm_key_request_properties':
-    return {key: 'drmKeyRequestProperties', value: value};
   case 'ad_tag_uri':
     return {key: 'adTagUri', value: value};
+  case 'drm_license_url':
+    return {key: 'drmLicenseUrl', value: value};
+  case 'drm_multi_session':
+    return {key: 'drmMultiSession', value: value};
+  case 'drm_key_request_properties':
+    return {key: 'drmKeyRequestProperties', value: value};
+  case 'drm_scheme':
+    return {key: 'drmScheme', value: value};
   case 'extension':
-    key = 'contentType';
-    switch (value) {
-    case 'mpd':
-      value = ExoPlayer.CONTENT_TYPE_DASH;
-      break;
-    case 'm3u8':
-      value = ExoPlayer.CONTENT_TYPE_HLS;
-      break;
-    case 'ism':
-    case 'isml':
-    case 'ism/manifest':
-    case 'isml/manifest':
-      value = ExoPlayer.CONTENT_TYPE_SS;
-      break;
-    default:
-      value = ExoPlayer.CONTENT_TYPE_OTHER;
-    }
-    return {key: key, value: value};
+    return {key: 'contentExtension', value: value};
+  case 'uri':
+    return {key: 'url', value: value};
   default:
     return {key: key, value: value};
   }
