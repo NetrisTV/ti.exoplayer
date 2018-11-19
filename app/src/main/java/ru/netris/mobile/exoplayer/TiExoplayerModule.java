@@ -31,6 +31,7 @@ public class TiExoplayerModule extends KrollModule
 	public static final String PARAMETERS_PROPERTY_SPEED = "speed";
 
 	public static final String PROPERTY_AD_TAG_URI_EXTRA = "adTagUri";
+	public static final String PROPERTY_CONTENT_EXTENSION = "contentExtension";
 	public static final String PROPERTY_CONTENT_TYPE = "contentType";
 	public static final String PROPERTY_DRM_KEY_REQUEST_PROPERTIES = "drmKeyRequestProperties";
 	public static final String PROPERTY_DRM_LICENSE_URL = "drmLicenseUrl";

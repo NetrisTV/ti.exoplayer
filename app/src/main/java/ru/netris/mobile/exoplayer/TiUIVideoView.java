@@ -31,6 +31,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Messenger;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
@@ -728,8 +729,9 @@ public class TiUIVideoView extends TiUIView
 		}
 		player.setPlayWhenReady(shouldAutoPlay);
 		Uri uri = Uri.parse(uriString);
-		Object contentType = proxy.getProperty(TiExoplayerModule.PROPERTY_CONTENT_TYPE);
-		MediaSource mediaSource = buildMediaSource(uri, TiConvert.toString(contentType, null));
+		Object overrideType = proxy.getProperty(TiExoplayerModule.PROPERTY_CONTENT_TYPE);
+		Object overrideExtension = proxy.getProperty(TiExoplayerModule.PROPERTY_CONTENT_EXTENSION);
+		MediaSource mediaSource = buildMediaSource(uri, getContentType(uri, overrideType, overrideExtension));
 		String adTagUriString = TiConvert.toString(proxy.getProperty(TiExoplayerModule.PROPERTY_AD_TAG_URI_EXTRA));
 		if (adTagUriString != null) {
 			Uri adTagUri = Uri.parse(adTagUriString);
@@ -878,16 +880,26 @@ public class TiUIVideoView extends TiUIView
 											  multiSession);
 	}
 
+	private int getContentType(Uri uri, @Nullable Object overrideType, @Nullable Object overrideExtension)
+	{
+		String extension = TiConvert.toString(overrideExtension, null);
+		if (!TextUtils.isEmpty(extension)) {
+			return Util.inferContentType(uri, extension);
+		}
+		if (overrideType == null) {
+			return Util.inferContentType(uri);
+		}
+		return TiConvert.toInt(overrideType);
+	}
+
 	private MediaSource buildMediaSource(Uri uri)
 	{
-		return buildMediaSource(uri, null);
+		return buildMediaSource(uri, Util.inferContentType(uri));
 	}
 
 	@SuppressWarnings("unchecked")
-	private MediaSource buildMediaSource(Uri uri, @Nullable String overrideExtension)
+	private MediaSource buildMediaSource(Uri uri, @ContentType int type)
 	{
-		@ContentType
-		int type = Util.inferContentType(uri, overrideExtension);
 		switch (type) {
 			case C.TYPE_DASH:
 				return new DashMediaSource

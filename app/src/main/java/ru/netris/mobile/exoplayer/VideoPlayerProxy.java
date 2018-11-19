@@ -54,6 +54,7 @@ import com.google.android.exoplayer2.util.Util;
 		TiC.PROPERTY_PLAYABLE_DURATION,
 		TiC.PROPERTY_REPEAT_MODE,
 		TiC.PROPERTY_URL,
+		TiExoplayerModule.PROPERTY_CONTENT_EXTENSION,
 		TiExoplayerModule.PROPERTY_CONTENT_TYPE,
 		TiExoplayerModule.PROPERTY_DRM_KEY_REQUEST_PROPERTIES,
 		TiExoplayerModule.PROPERTY_DRM_LICENSE_URL,

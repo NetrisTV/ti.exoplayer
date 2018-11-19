@@ -77,6 +77,7 @@ For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](h
 
 ### Properties
 * `adTagUri`
+* `contentExtension`: type `string`, when defined content type will be detected based on this property
 * `contentType`: one of `ExoPlayer.CONTENT_TYPE_*`
 * `drmLicenseUrl`
 * `drmScheme`: one of `ExoPlayer.DRM_*`
