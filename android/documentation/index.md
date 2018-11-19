@@ -81,6 +81,8 @@ For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](h
 * `contentExtension`: type `string`, when defined content type will be detected based on this property
 * `contentType`: one of `ExoPlayer.CONTENT_TYPE_*`
 * `drmLicenseUrl`
+* **Deprecated** (use `drmMultiSession`) `drm_multi_session`: type `boolean`, specify whether multiple key session support is enabled. Default value `false`
+* `drmMultiSession`: type `boolean`, specify whether multiple key session support is enabled. Default value `false`
 * `drmScheme`: one of `ExoPlayer.DRM_*`
 * `drmKeyRequestProperties`
 * `linearGain`: Ajusts player [volume](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/SimpleExoPlayer.html#setVolume-float-), with 0 being silence and 1 being unity gain. Default value: 1

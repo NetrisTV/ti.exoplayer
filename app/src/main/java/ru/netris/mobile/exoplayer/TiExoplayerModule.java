@@ -35,7 +35,7 @@ public class TiExoplayerModule extends KrollModule
 	public static final String PROPERTY_CONTENT_TYPE = "contentType";
 	public static final String PROPERTY_DRM_KEY_REQUEST_PROPERTIES = "drmKeyRequestProperties";
 	public static final String PROPERTY_DRM_LICENSE_URL = "drmLicenseUrl";
-	public static final String PROPERTY_DRM_MULTI_SESSION_EXTRA = "drm_multi_session";
+	public static final String PROPERTY_DRM_MULTI_SESSION_EXTRA = "drmMultiSession";
 	public static final String PROPERTY_DRM_SCHEME_UUID_EXTRA = "drmScheme";
 	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
 	public static final String PROPERTY_NATURAL_SIZE = "naturalSize";

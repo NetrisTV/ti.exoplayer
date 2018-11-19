@@ -681,8 +681,10 @@ public class TiUIVideoView extends TiUIView
 					TiConvert.toString(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_LICENSE_URL));
 				String[] keyRequestPropertiesArray = TiConvert.toStringArray(
 					(Object[]) proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_KEY_REQUEST_PROPERTIES));
+				//Deprecated "drm_multi_session"
 				boolean multiSession =
-					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_MULTI_SESSION_EXTRA), false);
+					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_MULTI_SESSION_EXTRA),
+										TiConvert.toBoolean(proxy.getProperty("drm_multi_session"), false));
 				try {
 					int errorStringId = TiRHelper.getResource("string.error_drm_unknown");
 					if (Util.SDK_INT < 18) {
