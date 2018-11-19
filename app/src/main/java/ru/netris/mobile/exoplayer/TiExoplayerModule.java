@@ -48,7 +48,7 @@ public class TiExoplayerModule extends KrollModule
 
 	public static final String EVENT_PROPERTY_PIXEL_RATIO = "pixelRatio";
 
-	public static final String EVENT_TRACKS_CHANGED = "tracksChanged";
+	public static final String EVENT_TRACKS_CHANGED = "trackschange";
 	public static final String EVENT_VOLUME_CHANGE = "volumechange";
 
 	@Kroll.constant
