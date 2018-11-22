@@ -433,6 +433,14 @@ public class TiUIVideoView extends TiUIView
 		return (int) player.getCurrentPosition();
 	}
 
+	public int getBufferedPosition()
+	{
+		if (player == null) {
+			return 0;
+		}
+		return (int) player.getBufferedPosition();
+	}
+
 	public void seek(int milliseconds)
 	{
 		if (player == null) {

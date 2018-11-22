@@ -85,6 +85,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	private static final int MSG_HIDE_MEDIA_CONTROLLER = MSG_FIRST_ID + 110;
 	private static final int MSG_SET_VIEW_FROM_ACTIVITY = MSG_FIRST_ID + 111;
 	private static final int MSG_REPEAT_CHANGE = MSG_FIRST_ID + 112;
+	private static final int MSG_GET_BUFFERED_POSITION = MSG_FIRST_ID + 113;
 
 	// The player doesn't automatically preserve its current location and seek back to
 	// there when being resumed.  This internal property lets us track that.
@@ -479,6 +480,14 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 			case MSG_GET_PLAYBACK_TIME:
 				if (vv != null) {
 					((AsyncResult) msg.obj).setResult(vv.getCurrentPlaybackTime());
+				} else {
+					((AsyncResult) msg.obj).setResult(null);
+				}
+				handled = true;
+				break;
+			case MSG_GET_BUFFERED_POSITION:
+				if (vv != null) {
+					((AsyncResult) msg.obj).setResult(vv.getBufferedPosition());
 				} else {
 					((AsyncResult) msg.obj).setResult(null);
 				}
@@ -996,6 +1005,29 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	// clang-format on
 	{
 		return getPlaybackParametersDict(playbackParameters);
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.getProperty
+	public int getBufferedPosition()
+	// clang-format on
+	{
+		if (view != null) {
+			if (TiApplication.isUIThread()) {
+				return getVideoView().getBufferedPosition();
+			} else {
+				Object result =
+					TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_GET_BUFFERED_POSITION));
+				if (result instanceof Number) {
+					return ((Number) result).intValue();
+				} else {
+					return 0;
+				}
+			}
+		} else {
+			return 0;
+		}
 	}
 
 	public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio)
