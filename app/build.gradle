@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 
 def exoPlayerVersion = '2.8.4'
-def tiSDKVersion = getRootProject().ext.tiSDKVersion
 
 android {
     compileSdkVersion 28
