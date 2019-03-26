@@ -81,6 +81,6 @@ task downloadLibrary(type: Copy) {
 
 task tiBuild(type: Exec, dependsOn: ['downloadLibrary']) {
     commandLine 'ti', 'build', '--build-only', '--platform', 'android', "--sdk", tiSDKName
-    workingDir '../android'
+    workingDir '..'
 }
 
