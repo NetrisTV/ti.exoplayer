@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 
-def exoPlayerVersion = '2.8.4'
+def exoPlayerVersion = '2.9.6'
 
 android {
     compileSdkVersion 28

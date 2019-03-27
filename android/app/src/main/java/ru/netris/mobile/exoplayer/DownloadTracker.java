@@ -36,7 +36,7 @@ import com.google.android.exoplayer2.offline.DownloadManager;
 import com.google.android.exoplayer2.offline.DownloadManager.TaskState;
 import com.google.android.exoplayer2.offline.DownloadService;
 import com.google.android.exoplayer2.offline.ProgressiveDownloadHelper;
-import com.google.android.exoplayer2.offline.SegmentDownloadAction;
+import com.google.android.exoplayer2.offline.StreamKey;
 import com.google.android.exoplayer2.offline.TrackKey;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -116,16 +116,12 @@ public class DownloadTracker implements DownloadManager.Listener
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K> List<K> getOfflineStreamKeys(Uri uri)
+	public List<StreamKey> getOfflineStreamKeys(Uri uri)
 	{
 		if (!trackedDownloadStates.containsKey(uri)) {
 			return Collections.emptyList();
 		}
-		DownloadAction action = trackedDownloadStates.get(uri);
-		if (action instanceof SegmentDownloadAction) {
-			return ((SegmentDownloadAction) action).keys;
-		}
-		return Collections.emptyList();
+		return trackedDownloadStates.get(uri).getKeys();
 	}
 
 	public void toggleDownload(Activity activity, String name, Uri uri, String extension)

@@ -55,16 +55,16 @@ public class DownloadTrackerProxy extends KrollProxy implements DownloadTracker.
 	}
 
 	/** Returns a {@link HttpDataSource.Factory}. */
-	public HttpDataSource.Factory buildHttpDataSourceFactory(TransferListener<? super DataSource> listener)
+	public HttpDataSource.Factory buildHttpDataSourceFactory()
 	{
-		return new DefaultHttpDataSourceFactory(userAgent, listener);
+		return new DefaultHttpDataSourceFactory(userAgent);
 	}
 
 	/** Returns a {@link DataSource.Factory}. */
-	public DataSource.Factory buildDataSourceFactory(TransferListener<? super DataSource> listener)
+	public DataSource.Factory buildDataSourceFactory()
 	{
 		DefaultDataSourceFactory upstreamFactory = new DefaultDataSourceFactory(
-			TiApplication.getAppRootOrCurrentActivity(), listener, buildHttpDataSourceFactory(listener));
+			TiApplication.getAppRootOrCurrentActivity(), buildHttpDataSourceFactory());
 		return buildReadOnlyCacheDataSource(upstreamFactory, getDownloadCache());
 	}
 
@@ -84,12 +84,12 @@ public class DownloadTrackerProxy extends KrollProxy implements DownloadTracker.
 	{
 		if (downloadManager == null) {
 			DownloaderConstructorHelper downloaderConstructorHelper =
-				new DownloaderConstructorHelper(getDownloadCache(), buildHttpDataSourceFactory(/* listener= */ null));
+				new DownloaderConstructorHelper(getDownloadCache(), buildHttpDataSourceFactory());
 			downloadManager = new DownloadManager(
 				downloaderConstructorHelper, maxSimultaneousDownloads, DownloadManager.DEFAULT_MIN_RETRY_COUNT,
 				new File(getDownloadDirectory(), downloadActionFile), DOWNLOAD_DESERIALIZERS);
 			downloadTracker = new DownloadTracker(
-				/* context= */ TiApplication.getInstance(), buildDataSourceFactory(/* listener= */ null),
+				/* context= */ TiApplication.getInstance(), buildDataSourceFactory(),
 				new File(getDownloadDirectory(), downloadTrackerActionFile), DOWNLOAD_DESERIALIZERS);
 			downloadManager.addListener(downloadTracker);
 			downloadTracker.addListener(this);
