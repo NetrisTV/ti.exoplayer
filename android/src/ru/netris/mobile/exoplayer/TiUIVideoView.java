@@ -193,6 +193,8 @@ public class TiUIVideoView extends TiUIView
 					path = "layout.player_view_none";
 				} else if (surfaceType == TiExoplayerModule.SURFACE_TYPE_TEXTURE_VIEW) {
 					path = "layout.player_view_texture_view";
+				} else if (surfaceType == TiExoplayerModule.SURFACE_TYPE_SPHERICAL_VIEW) {
+					path = "layout.player_view_spherical_view";
 				} else if (surfaceType != TiExoplayerModule.SURFACE_TYPE_SURFACE_VIEW) {
 					Log.e(TAG, "Wrong \"" + TiExoplayerModule.PROPERTY_SURFACE_TYPE + "\" property value:" + surfaceType
 								   + ". Fallback to SurfaceView");

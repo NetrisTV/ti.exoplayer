@@ -47,6 +47,7 @@ The `ExoPlayer` variable is a reference to the Module object.
 * `ExoPlayer.SURFACE_TYPE_NONE`
 * `ExoPlayer.SURFACE_TYPE_SURFACE_VIEW`
 * `ExoPlayer.SURFACE_TYPE_TEXTURE_VIEW`
+* `ExoPlayer.SURFACE_TYPE_SPHERICAL_VIEW`
 
 ## VideoPlayer
 For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media.VideoPlayer).

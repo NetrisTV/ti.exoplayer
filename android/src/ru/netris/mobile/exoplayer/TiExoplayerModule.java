@@ -135,6 +135,9 @@ public class TiExoplayerModule extends KrollModule
 	@Kroll.constant
 	public static final int SURFACE_TYPE_TEXTURE_VIEW = 2;
 
+	@Kroll.constant
+	public static final int SURFACE_TYPE_SPHERICAL_VIEW = 3;
+
 	private String downloadActionFile = "actions";
 	private String downloadTrackerActionFile = "tracked_actions";
 	private String downloadContentDirectory = "downloads";
