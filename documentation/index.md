@@ -72,7 +72,6 @@ For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](h
 * `naturalsizeavailable`: new event, property `naturalSize`
  (see [VideoRendererEventListener.onVideoSizeChanged](http://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/video/VideoRendererEventListener.html#onVideoSizeChanged-int-int-int-float-)).
  Fired before a frame is rendered for the first time since setting the surface, and each time there's a change in the size, rotation or pixel aspect ratio of the video being rendered.
-* **Deprecated** (use `trackschange`) `tracksChanged`: new event, property `trackInfo`
 * `trackschange`: new event, property `trackInfo`
 * `volumechange`: new event, property `volume`. Fired when the volume on [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC) changes.
 
@@ -81,7 +80,6 @@ For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](h
 * `contentExtension`: type `string`, when defined content type will be detected based on this property
 * `contentType`: one of `ExoPlayer.CONTENT_TYPE_*`
 * `drmLicenseUrl`
-* **Deprecated** (use `drmMultiSession`) `drm_multi_session`: type `boolean`, specify whether multiple key session support is enabled. Default value `false`
 * `drmMultiSession`: type `boolean`, specify whether multiple key session support is enabled. Default value `false`
 * `drmScheme`: one of `ExoPlayer.DRM_*`
 * `drmKeyRequestProperties`

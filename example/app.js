@@ -8,11 +8,11 @@
 //      ...
 //    </ti:app>
 
-var ExoPlayer = require('ru.netris.mobile.exoplayer');
-var exolist = 'https://raw.githubusercontent.com/google/ExoPlayer/r2.8.4/' +
+const ExoPlayer = require('ru.netris.mobile.exoplayer');
+const exolist = 'https://raw.githubusercontent.com/google/ExoPlayer/r2.9.6/' +
     'demos/main/src/main/assets/media.exolist.json';
 
-var OPTIONS = {
+const OPTIONS = {
   'Use Ti.Media.VideoPlayer': true,
   fullscreen: false,
   autoplay: true,
@@ -20,136 +20,146 @@ var OPTIONS = {
   showsControls: true
 };
 
+const PlayerEvents = [
+  'click',
+  'complete',
+  'durationavailable',
+  'error',
+  'load',
+  'loadstate',
+  'metadata',
+  'playbackstate',
+  'playing',
+  'postlayout',
+  'preload',
+  'naturalsizeavailable',
+  'trackschange',
+  'volumechange'
+];
+
 /**
  * @param {{
- *   drmScheme: string,
- *   drmLicenseUrl: string,
- *   drmKeyRequestProperties: string,
- *   adTagUri: string,
- *   contentType: number
+ *   drmScheme: (string | undefined),
+ *   drmLicenseUrl: (string | undefined),
+ *   drmKeyRequestProperties: (string | undefined),
+ *   adTagUri: (string | undefined),
+ *   contentType: (number | undefined),
  *   default: boolean,
  *   fullscreen: boolean,
  *   autoplay: boolean,
  *   showsControls: boolean,
  *   repeatMode: number,
- *   ur: string
+ *   url: string
  * }} options
  */
 function play(options) {
-  var vidWin;
-  var player;
-  var opts = {};
+  const opts = {};
 
   Object.keys(options).forEach(function(key) {
     opts[key] = options[key];
   });
-  if (!options.fullscreen) {
-    vidWin = Ti.UI.createWindow({
-      title: options['name'] || 'Video View Demo',
-      backgroundColor: '#fff'
-    });
-    opts['height'] = 300;
-    opts['width'] = 300;
-    opts['top'] = 10;
-  }
   console.log('Create player with ' + JSON.stringify(opts));
-  if (options.default) {
-    player = Ti.Media.createVideoPlayer(opts);
-  } else {
-    player = ExoPlayer.createVideoPlayer(opts);
-  }
-
-  var PlayerEvents = [
-    'click',
-    'complete',
-    'durationavailable',
-    'error',
-    'load',
-    'loadstate',
-    'metadata',
-    'playbackstate',
-    'playing',
-    'postlayout',
-    'preload',
-    'naturalsizeavailable',
-    'trackschange',
-    'volumechange'
-  ];
+  const player = options.default ? Ti.Media.createVideoPlayer(opts) : ExoPlayer.createVideoPlayer(opts);
 
   PlayerEvents.forEach(function(event) {
     player.addEventListener(event, function(e) {
       console.log('PLAYER EVENT ' + event);
       try {
-        var a = JSON.parse(JSON.stringify(e));
-        delete a.source;
-        console.log(a);
+        delete e.source;
+        console.log(e);
       } catch (e) {}
     });
   });
 
-  if (vidWin) {
-    var controls = Ti.UI.createView({
-      layout: 'vertical',
-      width: Ti.UI.FILL,
-      height: Ti.UI.SIZE,
-      bottom: 0,
-    });
-    var buttons = Ti.UI.createView({
-      layout: 'horizontal',
-      width: Ti.UI.FILL,
-      height: Ti.UI.SIZE
-    });
-    var btn1 = Ti.UI.createButton({
-      title: '+',
-      backgroundColor: '#ffbbbb',
-      color: '#000',
-      width: '33%'
-    });
-    var btn2 = Ti.UI.createButton({
-      title: 'reset',
-      backgroundColor: '#bbbbbb',
-      color: '#000',
-      width: '34%'
-    });
-    var btn3 = Ti.UI.createButton({
-      title: '-',
-      backgroundColor: '#bbffbb',
-      color: '#000',
-      width: '33%'
-    });
-    var label = Ti.UI.createLabel({
-      text: JSON.stringify(player.playbackParameters),
-      color: '#000',
-      height: Ti.UI.SIZE,
-      width: Ti.UI.FILL
-    });
-    btn1.addEventListener('click', function() {
-      var playbackParameters = player.playbackParameters;
-      player.playbackParameters = {
-        speed: playbackParameters.speed + 0.2
-      };
-      label.text = JSON.stringify(player.playbackParameters);
-    });
-    btn2.addEventListener('click', function() {
-      player.playbackParameters = ExoPlayer.DEFAULT_PLAYBACK_PARAMETERS;
-      label.text = JSON.stringify(player.playbackParameters);
-    });
-    btn3.addEventListener('click', function() {
-      var playbackParameters = player.playbackParameters;
-      player.playbackParameters = {
-        speed: playbackParameters.speed - 0.2
-      };
-      label.text = JSON.stringify(player.playbackParameters);
-    });
-    buttons.add(btn1);
-    buttons.add(btn2);
-    buttons.add(btn3);
-    controls.add(label);
-    controls.add(buttons);
-    vidWin.add(controls);
-    vidWin.add(player);
-    vidWin.open();
+  if (!options.fullscreen) {
+    opts['height'] = 300;
+    opts['width'] = 300;
+    opts['top'] = 10;
+    createWindowAndControls(options['name'], player)
   }
+}
+
+function createWindowAndControls(name, player) {
+  const vidWin = Ti.UI.createWindow({
+    title: name || 'Video View Demo',
+    backgroundColor: '#fff'
+  });
+  const controls = Ti.UI.createView({
+    layout: 'vertical',
+    width: Ti.UI.FILL,
+    height: Ti.UI.SIZE,
+    bottom: 0,
+  });
+  const buttons = Ti.UI.createView({
+    layout: 'horizontal',
+    width: Ti.UI.FILL,
+    height: Ti.UI.SIZE
+  });
+  const buttonIncrease = Ti.UI.createButton({
+    title: '+',
+    backgroundColor: '#ffbbbb',
+    color: '#000',
+    width: '33%'
+  });
+  const buttonReset = Ti.UI.createButton({
+    title: 'reset',
+    backgroundColor: '#bbbbbb',
+    color: '#000',
+    width: '34%'
+  });
+  const buttonReduce = Ti.UI.createButton({
+    title: '-',
+    backgroundColor: '#bbffbb',
+    color: '#000',
+    width: '33%'
+  });
+  const label = Ti.UI.createLabel({
+    text: JSON.stringify(player.playbackParameters),
+    color: '#000',
+    height: Ti.UI.SIZE,
+    width: Ti.UI.FILL
+  });
+  const increaseSpeed = function() {
+    const playbackParameters = player.playbackParameters;
+    player.playbackParameters = {
+      speed: playbackParameters.speed + 0.2
+    };
+    label.text = JSON.stringify(player.playbackParameters);
+  };
+  const resetParameters = function() {
+    player.playbackParameters = ExoPlayer.DEFAULT_PLAYBACK_PARAMETERS;
+    label.text = JSON.stringify(player.playbackParameters);
+  };
+  const reduceSpeed = function() {
+    const playbackParameters = player.playbackParameters;
+    const speed = playbackParameters.speed - 0.2;
+    if (speed > 0) {
+      player.playbackParameters = {
+        speed: speed
+      };
+    }
+    label.text = JSON.stringify(player.playbackParameters);
+  };
+  const removeListeners = function() {
+    buttonIncrease.removeEventListener('click', increaseSpeed);
+    buttonReset.removeEventListener('click', resetParameters);
+    buttonReduce.removeEventListener('click', reduceSpeed);
+    vidWin.removeEventListener('close', removeListeners);
+  };
+
+  buttonIncrease.addEventListener('click', increaseSpeed);
+  buttonReset.addEventListener('click', resetParameters);
+  buttonReduce.addEventListener('click', reduceSpeed);
+  vidWin.addEventListener('close', removeListeners);
+
+  buttons.add(buttonIncrease);
+  buttons.add(buttonReset);
+  buttons.add(buttonReduce);
+  controls.add(label);
+  controls.add(buttons);
+  vidWin.add(controls);
+  vidWin.add(player);
+  vidWin.open();
 }
 
 
@@ -175,14 +185,14 @@ function convertProperty(key, value) {
 }
 
 function loadList() {
-  var xhr = Ti.Network.createHTTPClient({
+  const xhr = Ti.Network.createHTTPClient({
     onload: function() {
       indicator.hide();
       createViews(JSON.parse(this.responseText));
     },
     onerror: function(e) {
       indicator.hide();
-      var notification = Ti.UI.createNotification({
+      const notification = Ti.UI.createNotification({
         message: e.code + ' ' + e.error,
         duration: Ti.UI.NOTIFICATION_DURATION_LONG
       });
@@ -197,8 +207,8 @@ function loadList() {
 }
 
 function createViews(json) {
-  var table = createTable(json);
-  var view = Ti.UI.createView({
+  const table = createTable(json);
+  const view = Ti.UI.createView({
     layout: 'vertical',
     height: Ti.UI.FILL,
     width: Ti.UI.FILL
@@ -211,9 +221,9 @@ function createViews(json) {
 }
 
 function createTable(json) {
-  var data = [];
+  const data = [];
   json.forEach(function(o) {
-    var section = Ti.UI.createTableViewSection({ headerTitle: o['name'] });
+    const section = Ti.UI.createTableViewSection({ headerTitle: o['name'] });
     o['samples'].forEach(function(row) {
       section.add(Ti.UI.createTableViewRow({
         color: '#000',
@@ -224,20 +234,21 @@ function createTable(json) {
     data.push(section);
   });
 
-  var table = Ti.UI.createTableView({data: data});
+  const table = Ti.UI.createTableView({data: data});
   table.addEventListener('click', function click(e) {
     if (e && e['source'] && e['source']['data'] && e['source']['data']['uri']) {
-      var options = e['source']['data'];
-      var opts = {
-        default: OPTIONS['Use Ti.Media.VideoPlayer'],
-        fullscreen: OPTIONS.fullscreen,
-        autoplay: OPTIONS.autoplay,
+      const options = e['source']['data'];
+      const opts = {
+        url: '',
+        default: !!OPTIONS['Use Ti.Media.VideoPlayer'],
+        fullscreen: !!OPTIONS.fullscreen,
+        autoplay: !!OPTIONS.autoplay,
         repeatMode: OPTIONS.repeatMode ?
           Ti.Media.VIDEO_REPEAT_MODE_ONE : Ti.Media.VIDEO_REPEAT_MODE_NONE,
-        showsControls: OPTIONS.showsControls
+        showsControls: !!OPTIONS.showsControls
       };
       Object.keys(options).forEach(function(key) {
-        var temp = convertProperty(key, options[key]);
+        const temp = convertProperty(key, options[key]);
         opts[temp.key] = temp.value;
       });
       play(opts);
@@ -247,12 +258,12 @@ function createTable(json) {
 }
 
 function createSwitch(name, parent) {
-  var line = Ti.UI.createView({
+  const line = Ti.UI.createView({
     backgroundColor: '#eee',
     height: Ti.UI.SIZE,
     width: Ti.UI.FILL
   });
-  var basicSwitch = Ti.UI.createSwitch({
+  const basicSwitch = Ti.UI.createSwitch({
     right: 10,
     value: OPTIONS[name]
   });
@@ -261,7 +272,7 @@ function createSwitch(name, parent) {
     OPTIONS[name] = e.value;
     label1.color = OPTIONS[name] ? '#900' : '#666';
   });
-  var label1 = Ti.UI.createLabel({
+  const label1 = Ti.UI.createLabel({
     color: OPTIONS[name] ? '#900' : '#666',
     text: name,
     textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
@@ -275,16 +286,15 @@ function createSwitch(name, parent) {
   parent.add(line);
 }
 
-var win = Ti.UI.createWindow({
+
+const win = Ti.UI.createWindow({
   title: 'Ti ExoPlayer Demo',
   backgroundColor: '#fff'
 });
 
-var indicator = Ti.UI.createActivityIndicator({
-  center: {x: '50%', y: '50%'}
-});
+const indicator = Ti.UI.createActivityIndicator();
 win.add(indicator);
-win.addEventListener('open', function(e) {
+win.addEventListener('open', function() {
   indicator.show();
   loadList();
 });

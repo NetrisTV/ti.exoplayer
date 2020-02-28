@@ -63,6 +63,7 @@ import com.google.android.exoplayer2.mediacodec.MediaCodecUtil.DecoderQueryExcep
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataOutput;
 import com.google.android.exoplayer2.offline.FilteringManifestParser;
+import com.google.android.exoplayer2.offline.StreamKey;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -72,14 +73,12 @@ import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.dash.manifest.DashManifestParser;
-import com.google.android.exoplayer2.source.dash.manifest.RepresentationKey;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.source.hls.playlist.DefaultHlsPlaylistParserFactory;
 import com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistParser;
-import com.google.android.exoplayer2.source.hls.playlist.RenditionKey;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifestParser;
-import com.google.android.exoplayer2.source.smoothstreaming.manifest.StreamKey;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
@@ -689,10 +688,8 @@ public class TiUIVideoView extends TiUIView
 					TiConvert.toString(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_LICENSE_URL));
 				String[] keyRequestPropertiesArray = TiConvert.toStringArray(
 					(Object[]) proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_KEY_REQUEST_PROPERTIES));
-				//Deprecated "drm_multi_session"
 				boolean multiSession =
-					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_MULTI_SESSION_EXTRA),
-										TiConvert.toBoolean(proxy.getProperty("drm_multi_session"), false));
+					TiConvert.toBoolean(proxy.getProperty(TiExoplayerModule.PROPERTY_DRM_MULTI_SESSION_EXTRA), false);
 				try {
 					int errorStringId = TiRHelper.getResource("string.error_drm_unknown");
 					if (Util.SDK_INT < 18) {
@@ -729,7 +726,8 @@ public class TiUIVideoView extends TiUIView
 			DefaultRenderersFactory renderersFactory =
 				new DefaultRenderersFactory(activity, drmSessionManager, extensionRendererMode);
 
-			player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, drmSessionManager);
+			player = ExoPlayerFactory.newSimpleInstance(proxy.getActivity(), renderersFactory, trackSelector,
+														drmSessionManager);
 			player.addListener(this);
 			player.addMetadataOutput(this);
 			player.setVideoDebugListener(this);
@@ -868,7 +866,7 @@ public class TiUIVideoView extends TiUIView
 		}
 	}
 
-	private List<?> getOfflineStreamKeys(Uri uri)
+	private List<StreamKey> getOfflineStreamKeys(Uri uri)
 	{
 		return TiExoplayerModule.getInstance().getDownloadTrackerProxy().getDownloadTracker().getOfflineStreamKeys(uri);
 	}
@@ -914,19 +912,17 @@ public class TiUIVideoView extends TiUIView
 			case C.TYPE_DASH:
 				return new DashMediaSource
 					.Factory(new DefaultDashChunkSource.Factory(mediaDataSourceFactory), buildDataSourceFactory(false))
-					.setManifestParser(new FilteringManifestParser<>(
-						new DashManifestParser(), (List<RepresentationKey>) getOfflineStreamKeys(uri)))
+					.setManifestParser(
+						new FilteringManifestParser<>(new DashManifestParser(), getOfflineStreamKeys(uri)))
 					.createMediaSource(uri);
 			case C.TYPE_SS:
 				return new SsMediaSource
 					.Factory(new DefaultSsChunkSource.Factory(mediaDataSourceFactory), buildDataSourceFactory(false))
-					.setManifestParser(new FilteringManifestParser<>(new SsManifestParser(),
-																	 (List<StreamKey>) getOfflineStreamKeys(uri)))
+					.setManifestParser(new FilteringManifestParser<>(new SsManifestParser(), getOfflineStreamKeys(uri)))
 					.createMediaSource(uri);
 			case C.TYPE_HLS:
 				return new HlsMediaSource.Factory(mediaDataSourceFactory)
-					.setPlaylistParser(new FilteringManifestParser<>(new HlsPlaylistParser(),
-																	 (List<RenditionKey>) getOfflineStreamKeys(uri)))
+					.setPlaylistParserFactory(new DefaultHlsPlaylistParserFactory(getOfflineStreamKeys(uri)))
 					.createMediaSource(uri);
 			case C.TYPE_OTHER:
 				return new ExtractorMediaSource.Factory(mediaDataSourceFactory).createMediaSource(uri);
@@ -977,7 +973,7 @@ public class TiUIVideoView extends TiUIView
 				return new int[] { C.TYPE_DASH, C.TYPE_SS, C.TYPE_HLS, C.TYPE_OTHER };
 			}
 		};
-		return new AdsMediaSource(mediaSource, adMediaSourceFactory, adsLoader, adUiViewGroup);
+		return new AdsMediaSource(mediaSource, adMediaSourceFactory, adsLoader, videoView);
 	}
 
 	/**
@@ -989,8 +985,7 @@ public class TiUIVideoView extends TiUIView
 	 */
 	private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter)
 	{
-		return TiExoplayerModule.getInstance().getDownloadTrackerProxy().buildDataSourceFactory(
-			useBandwidthMeter ? BANDWIDTH_METER : null);
+		return TiExoplayerModule.getInstance().getDownloadTrackerProxy().buildDataSourceFactory();
 	}
 
 	private static String getDiscontinuityReasonString(@Player.DiscontinuityReason int reason)

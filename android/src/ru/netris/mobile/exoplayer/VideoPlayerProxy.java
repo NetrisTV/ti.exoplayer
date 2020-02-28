@@ -733,7 +733,6 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 	{
 		KrollDict data = new KrollDict();
 		data.put("trackInfo", tracks);
-		fireEvent("tracksChanged", data); //Deprecated
 		fireEvent(TiExoplayerModule.EVENT_TRACKS_CHANGED, data);
 	}
 
