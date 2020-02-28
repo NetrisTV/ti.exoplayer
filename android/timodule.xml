@@ -12,7 +12,7 @@
 			<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 			<uses-feature android:name="android.software.leanback" android:required="false"/>
 			<uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
-			<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="28"/>
+			<uses-sdk android:targetSdkVersion="28"/>
 			<application>
 				<activity android:name="ru.netris.mobile.exoplayer.TiExoplayerActivity"
 					android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"

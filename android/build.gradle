@@ -1,0 +1,41 @@
+def exoPlayerVersion = '2.8.4'
+
+repositories {
+	google()
+	jcenter()
+}
+
+dependencies {
+	implementation("com.android.support:support-annotations:28.0.0")
+	implementation("com.google.android.exoplayer:exoplayer:${exoPlayerVersion}") {
+	    exclude group: 'com.google.android.gms', module: 'play-services-ads'
+	    exclude group: 'com.android.support'
+	}
+//    implementation ("com.google.android.exoplayer:exoplayer-core:${exoPlayerVersion}") {
+//        exclude group: 'com.android.support'
+//    }
+//    implementation ("com.google.android.exoplayer:exoplayer-dash:${exoPlayerVersion}") {
+//        exclude group: 'com.android.support'
+//    }
+//    implementation ("com.google.android.exoplayer:exoplayer-hls:${exoPlayerVersion}") {
+//        exclude group: 'com.android.support'
+//    }
+//    implementation ("com.google.android.exoplayer:exoplayer-smoothstreaming:${exoPlayerVersion}") {
+//        exclude group: 'com.android.support'
+//    }
+//    implementation ("com.google.android.exoplayer:exoplayer-ui:${exoPlayerVersion}") {
+//        exclude group: 'com.android.support'
+//    }
+	implementation ("com.google.android.exoplayer:extension-ima:${exoPlayerVersion}") {
+	    exclude group: 'com.google.android.gms', module: 'play-services-ads'
+	    exclude group: 'com.android.support'
+	}
+//    implementation ("com.google.android.exoplayer:extension-okhttp:${exoPlayerVersion}") {
+//        exclude group: 'com.android.support'
+//    }
+//    implementation ("com.google.android.exoplayer:extension-cast:${exoPlayerVersion}")
+//    implementation ("com.google.android.exoplayer:extension-gvr:${exoPlayerVersion}")
+//    implementation ("com.google.android.exoplayer:extension-leanback:${exoPlayerVersion}")
+//    implementation ("com.google.android.exoplayer:extension-mediasession:${exoPlayerVersion}")
+//    implementation ("com.google.android.exoplayer:extension-rtmp:${exoPlayerVersion}")
+}

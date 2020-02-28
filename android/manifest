@@ -2,17 +2,17 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 2.1.0
+version: 3.0.0
 apiversion: 4
-architectures: arm64-v8a armeabi-v7a x86
+architectures: arm64-v8a armeabi-v7a x86 x86_64
 description: A native control for playing videos for Titanium. Based on Google ExoPlayer, using Titanium.Media.VideoPlayer API.
 author: Sergey Volkov <s.volkov@netris.ru>
 license: Apache 2.0
-copyright: Copyright (c) 2018 by Netris, CJSC
+copyright: Copyright (c) 2020 by Netris, JSC
 
 # these should not be edited
 name: ti.exoplayer
 moduleid: ru.netris.mobile.exoplayer
 guid: 44228dfe-0521-4c68-b0fd-543b13f8c865
 platform: android
-minsdk: 7.1.0.GA
+minsdk: 9.0.0
