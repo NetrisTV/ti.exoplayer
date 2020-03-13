@@ -855,7 +855,7 @@ public class TiUIVideoView extends TiUIView
 		long currentPosition = player.getContentPosition();
 		if (currentPosition > 0) {
 			resumePosition = currentPosition;
-		} else {
+		} else if (proxy != null) {
 			resumePosition = getInitialPosition();
 		}
 	}
