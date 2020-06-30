@@ -46,9 +46,9 @@ dependencies {
         exclude group: 'com.google.android.gms', module: 'play-services-ads'
         exclude group: 'com.android.support'
     }
-//    libs("com.google.android.exoplayer:extension-okhttp:${exoPlayerVersion}") {
-//        exclude group: 'com.android.support'
-//    }
+    libs("com.google.android.exoplayer:extension-okhttp:${exoPlayerVersion}") {
+        exclude group: 'com.android.support'
+    }
 //    libs("com.google.android.exoplayer:extension-cast:${exoPlayerVersion}")
 //    libs("com.google.android.exoplayer:extension-gvr:${exoPlayerVersion}")
 //    libs("com.google.android.exoplayer:extension-leanback:${exoPlayerVersion}")

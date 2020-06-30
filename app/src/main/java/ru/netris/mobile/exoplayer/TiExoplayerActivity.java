@@ -83,6 +83,11 @@ public class TiExoplayerActivity extends Activity
 		if (videoView == null) {
 			videoView = new PlayerView(this);
 		}
+
+		if (intent.hasExtra(TiExoplayerModule.PROPERTY_KEEP_CONTENT_ON_PLAYER_RESET)) {
+			boolean keepContent = intent.getBooleanExtra(TiExoplayerModule.PROPERTY_KEEP_CONTENT_ON_PLAYER_RESET, false);
+			videoView.setKeepContentOnPlayerReset(keepContent);
+		}
 		layout.addView(videoView, new TiCompositeLayout.LayoutParams());
 
 		setContentView(layout);

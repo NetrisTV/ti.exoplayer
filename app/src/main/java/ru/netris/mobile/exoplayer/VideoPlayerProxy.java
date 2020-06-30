@@ -59,6 +59,8 @@ import com.google.android.exoplayer2.util.Util;
 		TiExoplayerModule.PROPERTY_DRM_LICENSE_URL,
 		TiExoplayerModule.PROPERTY_DRM_MULTI_SESSION_EXTRA,
 		TiExoplayerModule.PROPERTY_DRM_SCHEME_UUID_EXTRA,
+		TiExoplayerModule.PROPERTY_HTTP_READ_TIMEOUT,
+		TiExoplayerModule.PROPERTY_KEEP_CONTENT_ON_PLAYER_RESET,
 		TiExoplayerModule.PROPERTY_PREFER_EXTENSION_DECODERS,
 		TiExoplayerModule.PROPERTY_LINEAR_GAIN,
 		TiExoplayerModule.PROPERTY_SURFACE_TYPE
@@ -582,6 +584,39 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 			return new TiUIVideoView(this);
 		}
 	}
+
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.getProperty
+	public int getBufferedPosition()
+	// clang-format on
+	{
+		if (view != null) {
+			if (TiApplication.isUIThread()) {
+				return getVideoView().getBufferedPosition();
+			} else {
+				Object result =
+						TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_GET_PLAYBACK_TIME));
+				if (result instanceof Number) {
+					return ((Number) result).intValue();
+				} else {
+					return 0;
+				}
+			}
+		} else {
+			return 0;
+		}
+	}
+
+	// clang-format off
+	@Kroll.method
+	@Kroll.setProperty
+	public void setBufferedPosition(int position)
+	// clang-format on
+	{
+	}
+
 
 	// clang-format off
 	@Kroll.method

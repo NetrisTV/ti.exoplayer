@@ -94,6 +94,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
@@ -232,6 +233,9 @@ public class TiUIVideoView extends TiUIView
 			shouldAutoPlay = TiConvert.toBoolean(d, TiC.PROPERTY_AUTOPLAY);
 			player.setPlayWhenReady(shouldAutoPlay);
 		}
+		if (d.containsKeyAndNotNull(TiExoplayerModule.PROPERTY_KEEP_CONTENT_ON_PLAYER_RESET)) {
+			videoView.setKeepContentOnPlayerReset(TiConvert.toBoolean(d, TiExoplayerModule.PROPERTY_KEEP_CONTENT_ON_PLAYER_RESET, false));
+		}
 
 		PlaybackParameters playbackParameters = ((VideoPlayerProxy) proxy).playbackParameters;
 		if (!PlaybackParameters.DEFAULT.equals(playbackParameters)) {
@@ -270,6 +274,8 @@ public class TiUIVideoView extends TiUIView
 			if (player != null) {
 				player.setPlayWhenReady(shouldAutoPlay);
 			}
+		} else if (key.equals(TiExoplayerModule.PROPERTY_KEEP_CONTENT_ON_PLAYER_RESET)) {
+			videoView.setKeepContentOnPlayerReset(TiConvert.toBoolean(newValue));
 		} else {
 			super.propertyChanged(key, oldValue, newValue, proxy);
 		}
@@ -423,6 +429,14 @@ public class TiUIVideoView extends TiUIView
 			return;
 		}
 		player.setPlayWhenReady(false);
+	}
+
+	public int getBufferedPosition()
+	{
+		if (player == null) {
+			return 0;
+		}
+		return (int) player.getBufferedPosition();
 	}
 
 	public int getCurrentPlaybackTime()
@@ -981,8 +995,13 @@ public class TiUIVideoView extends TiUIView
 	 */
 	private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter)
 	{
-		return TiExoplayerModule.getInstance().getDownloadTrackerProxy().buildDataSourceFactory(
-			useBandwidthMeter ? BANDWIDTH_METER : null);
+		TransferListener<? super DataSource> listener = useBandwidthMeter ? BANDWIDTH_METER : null;
+		DownloadTrackerProxy dtp = TiExoplayerModule.getInstance().getDownloadTrackerProxy();
+		if (proxy.hasPropertyAndNotNull(TiExoplayerModule.PROPERTY_HTTP_READ_TIMEOUT)) {
+			int timeout = TiConvert.toInt(proxy.getProperty(TiExoplayerModule.PROPERTY_HTTP_READ_TIMEOUT));
+			return dtp.buildDataSourceFactory(listener, timeout);
+		}
+		return dtp.buildDataSourceFactory(listener);
 	}
 
 	private static String getDiscontinuityReasonString(@Player.DiscontinuityReason int reason)

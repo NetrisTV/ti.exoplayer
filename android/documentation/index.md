@@ -63,6 +63,11 @@ For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](h
 * `getVolume`: new method. Gets the value of the `volume` property.
 * `setLinearGain`: new method. Sets the value of the `linearGain` property.
 * `getLinearGain`: new method. Gets the value of the `linearGain` property.
+* `getBufferedPosition`: new method. Gets the value of `bufferedPosition` property.
+* `getHttpReadTimeout`: new method. Get the value of `httpReadTimeout` property.
+* `setHttpReadTimeout`: new method. Set the value of `httpReadTimeout` property.
+* `getKeepContentOnPlayerReset` new method. Get the value of `keepContentOnPlayerReset` property.
+* `setKeepContentOnPlayerReset` new method. Set the value of `keepContentOnPlayerReset` property.
 
 ### Events
 * ~~`durationAvailable`~~: removed (was deprecated, use `durationavailable`)
@@ -98,6 +103,9 @@ For full VideoPlayer API see documentation for original [Ti.Media.VideoPlayer](h
 * `showsControls`: [`videoPlayer.showsControls`](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media.VideoPlayer-property-showsControls)
 * `surfaceType`: The type of surface view used for video playbacks. Valid values are `ExoPlayer.SURFACE_TYPE_*`.
 * `volume`: Ajusts volume of [`AudioManager.STREAM_MUSIC`](https://developer.android.com/reference/android/media/AudioManager.html#STREAM_MUSIC)
+* `bufferedPosition`: [position](https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/SimpleExoPlayer.html#getBufferedPosition--) up to which data is buffered, in milliseconds. 
+* `httpReadTimeout`: [OkHttpClient.Builder.readTimeout](https://square.github.io/okhttp/3.x/okhttp/okhttp3/OkHttpClient.Builder.html#readTimeout-long-java.util.concurrent.TimeUnit-)
+* `keepContentOnPlayerReset`: Sets whether the currently displayed video frame or media artwork is kept visible when the player is reset. [playerView.setKeepContentOnPlayerReset](https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/ui/PlayerView.html#setKeepContentOnPlayerReset-boolean-)
 
 
 ## Usage

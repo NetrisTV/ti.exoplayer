@@ -3,6 +3,7 @@ package ru.netris.mobile.exoplayer;
 import android.app.Activity;
 import android.net.Uri;
 
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.offline.DownloadAction;
 import com.google.android.exoplayer2.offline.DownloadManager;
 import com.google.android.exoplayer2.offline.DownloaderConstructorHelper;
@@ -30,6 +31,9 @@ import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 @Kroll.proxy
 public class DownloadTrackerProxy extends KrollProxy implements DownloadTracker.Listener
@@ -59,6 +63,17 @@ public class DownloadTrackerProxy extends KrollProxy implements DownloadTracker.
 	{
 		return new DefaultHttpDataSourceFactory(userAgent, listener);
 	}
+
+	public DataSource.Factory buildDataSourceFactory(TransferListener<? super DataSource> listener, int timeout)
+	{
+		OkHttpClient client = new OkHttpClient.Builder().readTimeout(timeout, TimeUnit.SECONDS).build();
+		client.readTimeoutMillis();
+		OkHttpDataSourceFactory okhttp = new OkHttpDataSourceFactory(client, userAgent, listener);
+		DefaultDataSourceFactory upstreamFactory = new DefaultDataSourceFactory(
+				TiApplication.getAppRootOrCurrentActivity(), listener, okhttp);
+		return buildReadOnlyCacheDataSource(upstreamFactory, getDownloadCache());
+	}
+
 
 	/** Returns a {@link DataSource.Factory}. */
 	public DataSource.Factory buildDataSourceFactory(TransferListener<? super DataSource> listener)

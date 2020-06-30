@@ -37,10 +37,12 @@ public class TiExoplayerModule extends KrollModule
 	public static final String PROPERTY_DRM_LICENSE_URL = "drmLicenseUrl";
 	public static final String PROPERTY_DRM_MULTI_SESSION_EXTRA = "drmMultiSession";
 	public static final String PROPERTY_DRM_SCHEME_UUID_EXTRA = "drmScheme";
+	public static final String PROPERTY_KEEP_CONTENT_ON_PLAYER_RESET = "keepContentOnPlayerReset";
 	public static final String PROPERTY_LINEAR_GAIN = "linearGain";
 	public static final String PROPERTY_NATURAL_SIZE = "naturalSize";
 	public static final String PROPERTY_PLAYBACK_PARAMETERS = "playbackParameters";
 	public static final String PROPERTY_PREFER_EXTENSION_DECODERS = "preferExtensionDecoders";
+	public static final String PROPERTY_HTTP_READ_TIMEOUT = "httpReadTimeout";
 	public static final String PROPERTY_SURFACE_TYPE = "surfaceType";
 
 	public static final String EVENT_METADATA = "metadata";
