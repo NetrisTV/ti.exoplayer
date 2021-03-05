@@ -19,7 +19,7 @@ import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiBaseActivity;
 import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.TiLifecycle;
-import org.appcelerator.titanium.io.TitaniumBlob;
+import org.appcelerator.titanium.io.TiContentFile;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.util.TiConvert;
 import org.appcelerator.titanium.view.TiUIView;
@@ -897,7 +897,7 @@ public class VideoPlayerProxy extends TiViewProxy implements TiLifecycle.OnLifec
 				mTiThumbnailRetriever.setUri(
 					Uri.parse(this.resolveUrl(null, TiConvert.toString(this.getProperty(TiC.PROPERTY_URL)))));
 			} else {
-				String path = url.contains(":") ? new TitaniumBlob(url).getNativePath() : resolveUrl(null, url);
+				String path = url.contains(":") ? new TiContentFile(url).nativePath() : resolveUrl(null, url);
 				Uri uri = Uri.parse(path);
 				mTiThumbnailRetriever.setUri(uri);
 			}
